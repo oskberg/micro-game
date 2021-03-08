@@ -1,6 +1,9 @@
 #include <xc.inc>
     
 ; ====== COMMENTS ====== 
+;   This file contains subroutines for driving the GLCD
+
+;   PIN CONFUGURATION ON GLCD:
 ;    control lines	PortB
 ;    data lines		PortD
 ;    
@@ -21,7 +24,8 @@
 ; ====== IMPORTS/EXPORTS ======
 extrn	delay_ms, delay_x4us, delay
 
-global	GLCD_setup, GLCD_fill_0, GLCD_fill_1
+global	GLCD_setup, GLCD_fill_0, GLCD_fill_1, GLCD_fill_section, GLCD_left, GLCD_right
+global	y_pos, x_pos
     
 ; ====== VARIABLE DECLARATIONS ======
 ; DEFINE PINS
@@ -59,6 +63,33 @@ GLCD_fill_1:	; writes 1 to all pixels
 	movlw	0xFF
 	movwf	fill_val, A ; fill with empty
 	call    GLCD_fill
+	return	0
+	
+GLCD_left:  ; select left screen
+	bcf	LATB, CS1, A
+	bsf	LATB, CS2, A
+	return	0
+	
+GLCD_right:  ; select left screen
+	bsf	LATB, CS1, A
+	bcf	LATB, CS2, A
+	return	0
+	
+	
+GLCD_fill_section: ; fills a page at x_pos from pos_y to pos_y + w
+	movwf	y_counter, A
+	
+	call	GLCD_set_x
+	call	GLCD_set_y
+
+yLoopAdress:	; loop over y coordinates, writing the clear value
+    	; put  empty data to write to screen on data pins
+	movlw	0xff
+	movwf	LATD, A	
+	call	GLCD_write_d
+	decfsz	y_counter, F, A
+	bra	yLoopAdress	; loop over w addresses 
+	
 	return	0
 	
 	
