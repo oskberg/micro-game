@@ -28,8 +28,6 @@ setup:
 ; ====== MAIN PART ======
 ; Runs the game in a loop?
 main:
-	movlw	0x00
-	movwf	counter, A
 	call    GLCD_fill_0
 	call	long_delay
 	call    GLCD_fill_1	

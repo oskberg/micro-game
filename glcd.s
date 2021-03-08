@@ -36,15 +36,13 @@ global	GLCD_setup, GLCD_fill_0, GLCD_fill_1
 	x_len	EQU 8
     
 psect	udata_acs   ; named variables in access ram
+fill_val:   ds 1
 y_counter:  ds 1
 x_counter:  ds 1
 cs_counter: ds 1
 y_pos:	    ds 1
 x_pos:	    ds 1
-fill_val:   ds 1
 
-
-    
 ; =========================
 ; ====== SUBROUTINES ======
 ; =========================
@@ -87,7 +85,9 @@ w_x_loop:	; loop over all pages
 	incf	x_pos, F, A
 w_y_loop:	; loop over y coordinates, writing the clear value
     	; put  empty data to write to screen on data pins
-	movff	fill_val, LATD
+	movf	fill_val, W, A
+	movwf	LATD, A	
+;	movff	fill_val, LATD
 	call	GLCD_write_d
 	decfsz	y_counter, F, A
 	bra	w_y_loop	; loop over 64 addresses 
