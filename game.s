@@ -62,7 +62,7 @@ move_player_up:	    ; move player 1 square up
 	
 	call	GLCD_remove_section ; clear player
 	
-	incf	player_x, F, A	    ; incrament x position
+	decf	player_x, F, A	    ; decrament x position
 	movf	player_x, W, A
 	movwf	x_pos, A	    ; set x position
 	movlw	player_width
@@ -83,7 +83,7 @@ move_player_down:	  ; move player 1 square down
 	
 	call	GLCD_remove_section ; clear player
 	
-	decf	player_x, F, A	    ; decrament x position
+	incf	player_x, F, A	    ; incrament x position
 	movf	player_x, W, A
 	movwf	x_pos, A	    ; set x position
 	movlw	player_width
