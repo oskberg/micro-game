@@ -8,7 +8,7 @@
 global	delay_ms, delay_x4us, delay, long_delay, delay_key_press
 
 extrn	button_press
-extrn	inc_player_y
+extrn	inc_player_y, move_player_up, move_player_down
     
 psect	udata_acs   ; named variables in access ram
 cnt_l:		ds 1   ; reserve 1 byte for variable LCD_cnt_l
@@ -20,8 +20,8 @@ counter:	ds 1   ; reserve 1 byte for counting through nessage
 counter_pm:	ds 1   ; reserve 1 byte for counting through nessage
 shift_counter:	ds 1	;reserve 1 byte for shifting cursor
 input:		ds 1
-	up	equ	'2'
-	down	equ	'8'
+	up	equ	'2'	; key press to go up 
+	down	equ	'8'	; key press to go down
 
 	
 psect	delay_code,class=CODE
@@ -71,15 +71,13 @@ delay_x10ms:
 	movlw	up
 	cpfseq	input, A	; check if key press was up
 	bra	check_if_down	; if not check for down
-;	call	move_player_up	; move player up
-	call	inc_player_y
+	call	move_player_up	; move player up
 	bra	delay_x10ms_2	; continue loop
 check_if_down:
 	movlw	down
 	cpfseq	input, A	; check if key press was down
 	bra	delay_x10ms_2	; if not continue loop
-;	call	move_player_down    ; move player down
-	call	inc_player_y
+	call	move_player_down    ; move player down
 delay_x10ms_2:			; continue loop
 	movlw	0x0A
 	call	delay_ms	; 10ms delay

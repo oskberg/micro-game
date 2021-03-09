@@ -5,9 +5,9 @@
 ; ====== END OF COMMENTS ======
 
 ; ====== IMPORTS/EXPORTS ======
-global	init_player, draw_player, inc_player_y
+global	init_player, draw_player, inc_player_y, move_player_up, move_player_down
     
-extrn	GLCD_fill_section, GLCD_left, GLCD_right
+extrn	GLCD_fill_section, GLCD_left, GLCD_right, GLCD_remove_section
 extrn	x_pos, y_pos
 ; ====== VARIABLE DECLARATIONS ======
     
@@ -51,4 +51,43 @@ inc_player_y:    ; move player 1 step in y with wrapping edge
 	movwf	player_y, A
 incPy:	return	0
 	
+move_player_up:	    ; move player 1 square up 
+	call	GLCD_left	    ; player always on left side
+
+	movf	player_x, W, A
+	movwf	x_pos, A	    ; set players current x position
+	movf	player_y, W, A
+	movwf	y_pos, A	    ; set players current y position
+	movlw	player_width
 	
+	call	GLCD_remove_section ; clear player
+	
+	incf	player_x, F, A	    ; incrament x position
+	movf	player_x, W, A
+	movwf	x_pos, A	    ; set x position
+	movlw	player_width
+	
+	call	GLCD_fill_section   ; draw new position
+	
+	return	0
+	
+	
+move_player_down:	  ; move player 1 square down 
+	call	GLCD_left
+
+	movf	player_x, W, A
+	movwf	x_pos, A	    ; set players current x position
+	movf	player_y, W, A
+	movwf	y_pos, A	    ; set players current y position
+	movlw	player_width
+	
+	call	GLCD_remove_section ; clear player
+	
+	decf	player_x, F, A	    ; decrament x position
+	movf	player_x, W, A
+	movwf	x_pos, A	    ; set x position
+	movlw	player_width
+	
+	call	GLCD_fill_section   ; draw new player
+	
+	return	0

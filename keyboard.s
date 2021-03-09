@@ -64,12 +64,6 @@ button_press:
 				    ; no key pressed
 	return
 	
-
-	
-;	; a delay subroutine if you need one, times around loop in delay_count
-;delay:	decfsz	delay_count, A	; decrement until zero
-;	bra	delay
-;	return
 	
 readRow:	; read row output
 	movlw	0x0f	    ; set 0-3 as input and 4-7 as output on PORT E
@@ -113,17 +107,12 @@ keyLoop:
 	movf	padVal, W, A		; put pad value in w
 	cpfseq	TABLAT, A	; exit iteration if tablat == w
 	bra	keyLoop
-	
-;	movf	keyCounter, W, A
-	; set carry bit low
-	; (HOW???)
-	
+		
 	movlw	low highword(padVals)	; address of data in PM
 	movwf	TBLPTRU, A		; load upper bits to TBLPTRU
 	movlw	low(padVals)		; address of data in PM
 	movwf	TBLPTRL, A		; load low byte to TBLPTRL
-;	movf	keyCounter, W, A
-;	addwf	TBLPTRL, A
+
 	movlw	high(padVals)		; address of data in PM
 	movwf	TBLPTRH, A		; load high byte to TBLPTRH
 	movf	keyCounter, W, A
