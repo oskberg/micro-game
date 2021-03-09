@@ -7,8 +7,9 @@
 
 ; ====== IMPORTS/EXPORTS ======
 extrn	GLCD_setup, GLCD_fill_0, GLCD_fill_1
-extrn	delay_ms, delay_x4us, delay, long_delay
+extrn	delay_ms, delay_x4us, delay, long_delay, delay_key_press
 extrn	init_player, draw_player, inc_player_y
+extrn	keyboard_setup
     
 ; ====== SETUP ======  
 ;    Code which prepares the micro processor to run the game
@@ -26,6 +27,7 @@ setup:
     
 	call	GLCD_setup
 	call	init_player
+	call	keyboard_setup
 	goto	main
 ; ====== END OF SETUP ======
 	
@@ -34,9 +36,10 @@ setup:
 main:
 	call	GLCD_fill_0
 	call	draw_player
-	movlw	0x28
-	call	delay_ms
-	call	inc_player_y
+;	movlw	0x28
+;	call	delay_ms
+	movlw	10
+	call	delay_key_press
 	
 	bra	main
 	
