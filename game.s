@@ -113,15 +113,29 @@ draw_level:
 ;	movlb	0x01
 ;	movf	current_gaps, W, B
 ;	movlb	0x00
-	
+	movlw	0x00
+	movwf	draw_count, A
+dlloop:	
 	movlw	0x03
 	movwf	current_gap, A
+	
+ 	movf	object_T, W, A
+	mulwf	draw_count, A
+	movf	PRODL, W, A
+	addlw	0x20	
+	movwf	current_obj_y, A
 	
 	movlw	0x00
 	movwf	x_pos, A
 	movlw	0x08
 	movwf	x_count, A
+	
 	call	draw_object
+	
+	incf	draw_count, F, A
+	movlw	0x03
+	cpfsgt	draw_count, A
+	bra	dlloop
 	return	0
 
 	
@@ -136,7 +150,7 @@ dolb1:	incf	x_pos, F, A
 	bra	draw_ob_loop
 	return	0
 	
-dolb2:	movlw	40
+dolb2:	movf	current_obj_y, W, A
 	movwf	y_pos, A
 	movf	object_width, W, A
 	call	GLCD_fill_page_whole
