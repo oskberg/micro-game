@@ -6,10 +6,10 @@
 
 ; ====== IMPORTS/EXPORTS ======
 global	init_player, draw_player, inc_player_y, move_player_up, move_player_down
+global	draw_object, load_level, draw_level
     
-extrn	GLCD_fill_section, GLCD_left, GLCD_right, GLCD_remove_section
-extrn	GLCD_fill_section, GLCD_left, GLCD_right, GLCD_fill_page_whole
-extrn	x_pos, y_pos
+extrn	GLCD_fill_section, GLCD_left, GLCD_right, GLCD_fill_page_whole, GLCD_remove_section, GLCD_set_x, GLCD_set_y
+extrn	x_pos, y_pos, y_pos_t
 ; ====== VARIABLE DECLARATIONS ======
     
 psect	udata_acs   ; named variables in access ram
@@ -27,6 +27,7 @@ object_T:	ds  1
 object_width:	ds  1
 current_obj_y:	ds  1
 x_count:	ds  1
+current_gap:	ds  1
     
 psect	udata_bank1
 current_gaps:	ds  20	    ; reserve some space for the current level
@@ -107,29 +108,42 @@ ll_loop:
 
 	return	0
 	
-;draw_level:
-;	; loop over all objects to draw 
-;	movlb	0x01	; level variables in bank 1
-;	movlw	0x01
-;	movwf	draw_count, B
-;		
-;	movlb	0x00		; reset bank
-;	return	0
-;
+draw_level:
+	; loop over all objects to draw 
+;	movlb	0x01
+;	movf	current_gaps, W, B
+;	movlb	0x00
 	
-draw_object:	; draws a line at current_obj_y with a gap at first_object pages
+	movlw	0x03
+	movwf	current_gap, A
+	
 	movlw	0x00
 	movwf	x_pos, A
 	movlw	0x08
 	movwf	x_count, A
+	call	draw_object
+	return	0
+
+	
+draw_object:	; draws a line at current_obj_y with a gap at first_object pages
+
 draw_ob_loop:	
-	movlw	60
+	movf	current_gap, W, A
+	cpfseq	x_pos, A
+	bra	dolb2
+dolb1:	incf	x_pos, F, A
+	decfsz	x_count, A
+	bra	draw_ob_loop
+	return	0
+	
+dolb2:	movlw	40
 	movwf	y_pos, A
 	movf	object_width, W, A
 	call	GLCD_fill_page_whole
-	incf	x_pos, F, A
-	decfsz	x_count, A
-	bra	draw_ob_loop
+	bra	dolb1
+
+	
+	
 move_player_up:	    ; move player 1 square up 
 	call	GLCD_left	    ; player always on left side
 

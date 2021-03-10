@@ -24,10 +24,9 @@
 ; ====== IMPORTS/EXPORTS ======
 extrn	delay_ms, delay_x4us, delay
 
-global	GLCD_setup, GLCD_fill_0, GLCD_fill_1, GLCD_fill_section, GLCD_left, GLCD_right
-global	GLCD_fill_page_whole
+global	GLCD_fill_page_whole, GLCD_set_x, GLCD_set_y
 global	GLCD_setup, GLCD_fill_0, GLCD_fill_1, GLCD_fill_section, GLCD_remove_section, GLCD_left, GLCD_right
-global	y_pos, x_pos
+global	y_pos, x_pos, y_pos_t
     
 ; ====== VARIABLE DECLARATIONS ======
 ; DEFINE PINS
@@ -48,6 +47,8 @@ x_counter:  ds 1
 cs_counter: ds 1
 y_pos:	    ds 1
 x_pos:	    ds 1
+y_pos_t:    ds 1
+y_temp:	    ds 1
 
 ; =========================
 ; ====== SUBROUTINES ======
@@ -74,18 +75,34 @@ GLCD_left:  ; select left screen and set coordinates
 	call	GLCD_set_y
 	return	0
 	
+GLCD_left_simp:  ; select left screen and set coordinates
+	bcf	LATB, CS1, A
+	bsf	LATB, CS2, A
+;	call	GLCD_set_x  ; set coordinates to what they were on the other side?
+;	call	GLCD_set_y_dec
+	return	0
+	
 GLCD_right:  ; select right screen and set coordinates
 	bsf	LATB, CS1, A
 	bcf	LATB, CS2, A
 	call	GLCD_set_x  ; set coordinates to what they were on the other side?
 	call	GLCD_set_y	
 	return	0
-	
-GLCD_right_dec:  ; select right screen and set coordinates using new coordinate function.
+
+GLCD_right_dec:  ; select right screen and set coordinates
 	bsf	LATB, CS1, A
 	bcf	LATB, CS2, A
+	movlw	63		; subtract 64 from y_pos
+	subwf	y_pos, F, A
 	call	GLCD_set_x  ; set coordinates to what they were on the other side?
-	call	GLCD_set_y_dec	
+	call	GLCD_set_y
+	return	0
+	
+GLCD_right_simp:  ; select right screen and set coordinates using new coordinate function.
+	bsf	LATB, CS1, A
+	bcf	LATB, CS2, A
+	movlw	60
+	subwf	y_pos, F, A
 	return	0
 	
 GLCD_fill_section: ; fills a page at x_pos from pos_y to pos_y + w
@@ -105,19 +122,25 @@ yLoopAdress:	; loop over y coordinates, writing the clear value
 	return	0
 	
 GLCD_fill_page_whole: ; fills a page at x_pos from pos_y to pos_y + w
-	movwf	y_counter, A
-	call	GLCD_left
+	movwf	y_counter, A	; set witdth
+	call	GLCD_left_simp	; set to left screen
 	call	GLCD_set_x
 	call	GLCD_set_y
-
+;	movlw	64
+;	cpfslt	y_pos, A
+;	call	GLCD_right_dec	    ; set y_pos and screen half correctly
 yLoopAdressW:	; loop over y coordinates
+	movlw	63
+	cpfslt	y_pos, A
+	call	GLCD_right_dec	    ; set y_pos and screen half correctly	
+	
 	movlw	0xff
 	movwf	LATD, A	
-	movlw	64
-	cpfslt	y_pos, A
-	call	GLCD_right
 	call	GLCD_write_d
+	
 	incf	y_pos, F, A 
+	
+	
 	decfsz	y_counter, F, A
 	bra	yLoopAdressW	; loop over w addresses 
 	
@@ -211,7 +234,9 @@ GLCD_on:    ; turns the screen on (needed to show output)
 GLCD_set_y:	; set y address to y_pos
 	bcf	LATB, RS, A
 	bcf	LATB, RW_DI, A
+	decf	y_pos, F, A
 	movlw	00111111B
+;	movlw	0xff
 	andwf	y_pos, F, A	; enables wrapping edges
 	movlw	01000000B	; last 6 are the coordinate
 	addwf	y_pos, W, A	; add current y position to instruction for address 0
@@ -221,9 +246,11 @@ GLCD_set_y:	; set y address to y_pos
 	bsf	LATB, RW_DI, A
 	return
 	
-;GLCD_set_y_dec:	; set y address to y_pos - 64 if too large
+;GLCD_set_y_t:	; set y address to y_pos
 ;	bcf	LATB, RS, A
 ;	bcf	LATB, RW_DI, A
+;	movlw	00111111B
+;	andwf	y_pos, F, A	; enables wrapping edges
 ;	movlw	01000000B	; last 6 are the coordinate
 ;	addwf	y_pos, W, A	; add current y position to instruction for address 0
 ;	movwf	LATD, A
@@ -231,7 +258,25 @@ GLCD_set_y:	; set y address to y_pos
 ;	bsf	LATB, RS, A
 ;	bsf	LATB, RW_DI, A
 ;	return
-;	
+	
+GLCD_set_y_dec:	; set y address to y_pos_t - 64 if too large
+	movff	y_pos_t, y_pos
+	call	GLCD_left_simp
+	movlw	64
+	cpfslt	y_pos_t, A
+	call	GLCD_right_simp
+    
+	bcf	LATB, RS, A
+	bcf	LATB, RW_DI, A
+	movlw	00111111B
+	andwf	y_pos, F, A	; enables wrapping edges
+	movlw	01000000B	; last 6 are the coordinate
+	addwf	y_pos, W, A	; add current y position to instruction for address 0
+	movwf	LATD, A
+	call	GLCD_write_i
+	bsf	LATB, RS, A
+	bsf	LATB, RW_DI, A
+	return	0
 	
 GLCD_set_x:	; set page to x_pos
 	bcf	LATB, RS, A
@@ -323,8 +368,8 @@ GLCD_write_i:	; writes instructions
 	call	delay_x4us
 	
 	; E high
-	bsf	LATB, E, A
 	bsf	LATB, RW_DI, A
 	bcf	LATB, RS, A	; change for instruction/data
+	bsf	LATB, E, A
 	
 	return
