@@ -5,7 +5,7 @@
 ;    Taken from Simple1 
 ;    Need to reference properly... TODO
    
-global	delay_ms, delay_x4us, delay, long_delay, delay_key_press
+global	delay_ms, delay_x4us, delay, long_delay, delay_key_press, delay_menu
 
 extrn	button_press
 extrn	inc_player_y, move_player_up, move_player_down
@@ -22,6 +22,9 @@ shift_counter:	ds 1	;reserve 1 byte for shifting cursor
 input:		ds 1
 	up	equ	'2'	; key press to go up 
 	down	equ	'8'	; key press to go down
+	play	equ	'A'	; key press for menu --> play
+	options	equ	'B'	; key press for menu --> options
+	leader	equ	'C'	; key press for menu --> leaderboard
 
 	
 psect	delay_code,class=CODE
@@ -86,5 +89,22 @@ delay_x10ms_2:			; continue loop
 
 	return
 	
+delay_menu:	; delay routine which waits for valid input to move from menu
+	call	button_press	; takes input press
+	movwf	input, A	; stores in input
+	movlw	play
+	cpfseq	input, A	; checks if play button pressed
+	bra	options_select	; if not check options
+	retlw	play		; return play
+options_select:
+	movlw	options
+	cpfseq	input, A	; check if options button pressed
+	bra	leader_select	; if not check leader
+	retlw	options		; return option
+leader_select:
+	movlw	leader		
+	cpfseq	input, A	; check if leader button pressed
+	bra	delay_menu	; if not take new input
+	retlw	leader		; return leader
 	
     end
