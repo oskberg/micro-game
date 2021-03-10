@@ -8,8 +8,7 @@
 ; ====== IMPORTS/EXPORTS ======
 extrn	GLCD_setup, GLCD_fill_0, GLCD_fill_1
 extrn	delay_ms, delay_x4us, delay, long_delay
-extrn	init_player, draw_player, inc_player_y
-    
+extrn	init_player, draw_player, inc_player_y, load_level, draw_object
 ; ====== SETUP ======  
 ;    Code which prepares the micro processor to run the game
 psect	udata_acs   ; reserve data space in access ram
@@ -23,7 +22,7 @@ setup:
 ;   DONT THINK THESE ARE NEEDED:
 ;	bcf	CFGS	; point to Flash program memory  
 ;	bsf	EEPGD 	; access Flash program memory
-    
+	call	load_level
 	call	GLCD_setup
 	call	init_player
 	goto	main
@@ -36,7 +35,8 @@ main:
 	call	draw_player
 	movlw	0x28
 	call	delay_ms
-	call	inc_player_y
+;	call	inc_player_y
+	call	draw_object
 	
 	bra	main
 	

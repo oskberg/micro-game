@@ -25,6 +25,7 @@
 extrn	delay_ms, delay_x4us, delay
 
 global	GLCD_setup, GLCD_fill_0, GLCD_fill_1, GLCD_fill_section, GLCD_left, GLCD_right
+global	GLCD_fill_page_whole
 global	y_pos, x_pos
     
 ; ====== VARIABLE DECLARATIONS ======
@@ -65,16 +66,26 @@ GLCD_fill_1:	; writes 1 to all pixels
 	call    GLCD_fill
 	return	0
 	
-GLCD_left:  ; select left screen
+GLCD_left:  ; select left screen and set coordinates
 	bcf	LATB, CS1, A
 	bsf	LATB, CS2, A
+	call	GLCD_set_x  ; set coordinates to what they were on the other side?
+	call	GLCD_set_y
 	return	0
 	
-GLCD_right:  ; select left screen
+GLCD_right:  ; select right screen and set coordinates
 	bsf	LATB, CS1, A
 	bcf	LATB, CS2, A
+	call	GLCD_set_x  ; set coordinates to what they were on the other side?
+	call	GLCD_set_y	
 	return	0
 	
+GLCD_right_dec:  ; select right screen and set coordinates using new coordinate function.
+	bsf	LATB, CS1, A
+	bcf	LATB, CS2, A
+	call	GLCD_set_x  ; set coordinates to what they were on the other side?
+	call	GLCD_set_y_dec	
+	return	0
 	
 GLCD_fill_section: ; fills a page at x_pos from pos_y to pos_y + w
 	movwf	y_counter, A
@@ -89,6 +100,25 @@ yLoopAdress:	; loop over y coordinates, writing the clear value
 	call	GLCD_write_d
 	decfsz	y_counter, F, A
 	bra	yLoopAdress	; loop over w addresses 
+	
+	return	0
+	
+GLCD_fill_page_whole: ; fills a page at x_pos from pos_y to pos_y + w
+	movwf	y_counter, A
+	call	GLCD_left
+	call	GLCD_set_x
+	call	GLCD_set_y
+
+yLoopAdressW:	; loop over y coordinates
+	movlw	0xff
+	movwf	LATD, A	
+	movlw	64
+	cpfslt	y_pos, A
+	call	GLCD_right
+	call	GLCD_write_d
+	incf	y_pos, F, A 
+	decfsz	y_counter, F, A
+	bra	yLoopAdressW	; loop over w addresses 
 	
 	return	0
 	
@@ -171,6 +201,18 @@ GLCD_set_y:	; set y address to y_pos
 	bsf	LATB, RS, A
 	bsf	LATB, RW_DI, A
 	return
+	
+;GLCD_set_y_dec:	; set y address to y_pos - 64 if too large
+;	bcf	LATB, RS, A
+;	bcf	LATB, RW_DI, A
+;	movlw	01000000B	; last 6 are the coordinate
+;	addwf	y_pos, W, A	; add current y position to instruction for address 0
+;	movwf	LATD, A
+;	call	GLCD_write_i
+;	bsf	LATB, RS, A
+;	bsf	LATB, RW_DI, A
+;	return
+;	
 	
 GLCD_set_x:	; set page to x_pos
 	bcf	LATB, RS, A
