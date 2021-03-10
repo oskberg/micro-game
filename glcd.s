@@ -26,6 +26,7 @@ extrn	delay_ms, delay_x4us, delay
 
 global	GLCD_setup, GLCD_fill_0, GLCD_fill_1, GLCD_fill_section, GLCD_left, GLCD_right
 global	GLCD_fill_page_whole
+global	GLCD_setup, GLCD_fill_0, GLCD_fill_1, GLCD_fill_section, GLCD_remove_section, GLCD_left, GLCD_right
 global	y_pos, x_pos
     
 ; ====== VARIABLE DECLARATIONS ======
@@ -121,7 +122,23 @@ yLoopAdressW:	; loop over y coordinates
 	bra	yLoopAdressW	; loop over w addresses 
 	
 	return	0
+
 	
+GLCD_remove_section: ; clears a page at x_pos from pos_y to pos_y + w
+	movwf	y_counter, A
+	
+	call	GLCD_set_x
+	call	GLCD_set_y
+
+yLoopAdress_r:	; loop over y coordinates, writing the clear value
+    	; put  empty data to write to screen on data pins
+	movlw	0x00
+	movwf	LATD, A	
+	call	GLCD_write_d
+	decfsz	y_counter, F, A
+	bra	yLoopAdress_r	; loop over w addresses 
+	
+	return	0	
 	
 GLCD_fill:  ; fills screen with the value in fill_val
 	; wipe first half
@@ -194,6 +211,8 @@ GLCD_on:    ; turns the screen on (needed to show output)
 GLCD_set_y:	; set y address to y_pos
 	bcf	LATB, RS, A
 	bcf	LATB, RW_DI, A
+	movlw	00111111B
+	andwf	y_pos, F, A	; enables wrapping edges
 	movlw	01000000B	; last 6 are the coordinate
 	addwf	y_pos, W, A	; add current y position to instruction for address 0
 	movwf	LATD, A
@@ -217,6 +236,8 @@ GLCD_set_y:	; set y address to y_pos
 GLCD_set_x:	; set page to x_pos
 	bcf	LATB, RS, A
 	bcf	LATB, RW_DI, A
+	movlw	00000111B
+	andwf	x_pos, F, A	; enables wrapping edges
 	movlw	10111000B	; last three digits sets the coordinate
 	addwf	x_pos, W, A	; add current x position to instruction for page 0
 	movwf	LATD, A

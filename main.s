@@ -7,6 +7,10 @@
 
 ; ====== IMPORTS/EXPORTS ======
 extrn	GLCD_setup, GLCD_fill_0, GLCD_fill_1
+extrn	delay_ms, delay_x4us, delay, long_delay, delay_key_press
+extrn	init_player, draw_player, inc_player_y
+extrn	keyboard_setup
+    
 extrn	delay_ms, delay_x4us, delay, long_delay
 extrn	init_player, draw_player, inc_player_y, load_level, draw_object
 ; ====== SETUP ======  
@@ -25,6 +29,7 @@ setup:
 	call	load_level
 	call	GLCD_setup
 	call	init_player
+	call	keyboard_setup
 	goto	main
 ; ====== END OF SETUP ======
 	
@@ -37,6 +42,10 @@ main:
 	call	delay_ms
 ;	call	inc_player_y
 	call	draw_object
+;	movlw	0x28
+;	call	delay_ms
+	movlw	10
+	call	delay_key_press
 	
 	bra	main
 	
