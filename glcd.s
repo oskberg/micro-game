@@ -27,6 +27,8 @@ extrn	delay_ms, delay_x4us, delay
 global	GLCD_fill_page_whole, GLCD_set_x, GLCD_set_y
 global	GLCD_setup, GLCD_fill_0, GLCD_fill_1, GLCD_fill_section, GLCD_remove_section, GLCD_left, GLCD_right
 global	y_pos, x_pos, y_pos_t
+global	GLCD_setup, GLCD_fill_0, GLCD_fill_1, GLCD_fill_section, GLCD_remove_section, GLCD_left, GLCD_right, GLCD_set_x, GLCD_set_y, GLCD_write_d
+global	y_pos, x_pos
     
 ; ====== VARIABLE DECLARATIONS ======
 ; DEFINE PINS
