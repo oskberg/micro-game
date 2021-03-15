@@ -6,7 +6,7 @@
 
 ; ====== IMPORTS/EXPORTS ======
 global	init_player, draw_player, inc_player_y, move_player_up, move_player_down
-global	draw_object, load_level, draw_level
+global	draw_object, load_level, draw_level, check_collision
     
 extrn	GLCD_fill_section, GLCD_left, GLCD_right, GLCD_fill_page_whole, GLCD_remove_section, GLCD_set_x, GLCD_set_y
 extrn	x_pos, y_pos, y_pos_t, time
@@ -18,7 +18,7 @@ player_y:	ds 1
 temp_count:	ds 1
 score:		ds 1
 
-    player_width	equ 0x0A
+    player_width	equ 0x08
 
 psect	udata_acs
 first_object:	ds  1
@@ -102,6 +102,7 @@ ll_loop:
 	movwf	first_object, A
 	movwf	score, A
 	movlw	0x08		
+	movlw	0x04		
 	movwf	object_width, A	; set object with to 8 pixels
 	movlw	24
 	movwf	object_T, A	; set object separation to 24 pixels
@@ -176,10 +177,10 @@ dolb2:	movf	current_obj_y, W, A
 	movf	object_width, W, A
 	call	GLCD_fill_page_whole
 	bra	dolb1
+	return	0
 
 	
-	
-move_player_up:	    ; move player 1 square up 
+clear_player:
 	call	GLCD_left	    ; player always on left side
 
 	movf	player_x, W, A
@@ -189,33 +190,36 @@ move_player_up:	    ; move player 1 square up
 	movlw	player_width
 	
 	call	GLCD_remove_section ; clear player
-	
+	return
+    
+move_player_up:	    ; move player 1 square up 
+	call	clear_player
 	decf	player_x, F, A	    ; decrament x position
-	movf	player_x, W, A
-	movwf	x_pos, A	    ; set x position
-	movlw	player_width
-	
-	call	GLCD_fill_section   ; draw new position
-	
+	call	draw_player
 	return	0
 	
 	
-move_player_down:	  ; move player 1 square down 
-	call	GLCD_left
-
-	movf	player_x, W, A
-	movwf	x_pos, A	    ; set players current x position
-	movf	player_y, W, A
-	movwf	y_pos, A	    ; set players current y position
-	movlw	player_width
-	
-	call	GLCD_remove_section ; clear player
-	
+move_player_down:   ; move player 1 square down 
+	call	clear_player
 	incf	player_x, F, A	    ; incrament x position
-	movf	player_x, W, A
-	movwf	x_pos, A	    ; set x position
-	movlw	player_width
-	
-	call	GLCD_fill_section   ; draw new player
-	
+	call	draw_player
 	return	0
+
+check_collision: 
+	movf	time, W, A
+	subwf	object_T, W, A
+	movwf	current_obj_y, A
+	movf	player_y, W, A
+	addlw	player_width
+	cpfslt	current_obj_y, A
+	retlw	0
+	
+	lfsr	0, current_gaps	    ; load lsfr 0 which holds the gaps
+	movf	first_object, W, A
+	addwf	FSR0, F, A
+	movf	POSTINC0, W, A  ; move gap at lsfr0 into current_gap
+	movwf	current_gap, A
+	movf	player_x, W, A
+	cpfseq	current_gap, A
+	retlw	1
+	retlw	0

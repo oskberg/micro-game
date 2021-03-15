@@ -8,15 +8,22 @@
 ; ====== IMPORTS/EXPORTS ======
 extrn	GLCD_set_x, GLCD_set_y, GLCD_write_d, GLCD_left, GLCD_remove_section, GLCD_right
 extrn	x_pos, y_pos
+extrn	delay_ms, delay_x4us, delay, long_delay, delay_key_press, delay_menu
+extrn	GLCD_setup, GLCD_fill_0, GLCD_fill_1
+extrn	init_player, draw_player, inc_player_y
 
-global	draw_menu
+
+global	draw_menu, menu_plus_options, draw_end_screen
     
 ; =========================
 ; ====== SUBROUTINES ======
 ; =========================
 psect	udata_acs   ; reserve data space in access ram
 counter:    ds 1    ; reserve one byte for a counter variable
-
+key:	    ds 1
+	play_key	equ	'A'
+	options_key	equ	'B'
+	leader_key	equ	'C'
 psect	menu_code, class=CODE	 
 
 draw_menu:  ; draws the main menu
@@ -365,6 +372,94 @@ draw_menu:  ; draws the main menu
    call	    D
    return
 
+draw_end_screen:
+    ; writes "main menu" to top line
+   call	    GLCD_left
+   movlw    0x00
+   movwf    x_pos, A
+   call	    GLCD_set_x
+   movlw    0x00
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    Y
+   movlw    0x08
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    O
+   movlw    0x10
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    U
+   movlw    0x18
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    GAP
+   movlw    0x20
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    L
+   movlw    0x28
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    O
+   movlw    0x30
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    S
+   movlw    0x38
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    E
+
+   ; display 'score: x'
+   movlw    0x03
+   movwf    x_pos, A
+   call	    GLCD_set_x
+   movlw    0x00
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    S
+   movlw    0x08
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    C_
+   movlw    0x10
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    O
+   movlw    0x18
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    R
+   movlw    0x20
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    E
+   movlw    0x28
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    COLON
+   movlw    0x30
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    GAP
+   movlw    0x38
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    _7
+   
+;   call	    GLCD_right
+;   movlw    0x00
+;   movwf    y_pos, A
+;   call	    GLCD_set_y
+;   call	    GLCD_set_x
+;   call	    GAP
+;   movlw    0x08
+;   movwf    y_pos, A
+;   call	    GLCD_set_y
+;   call	    _7
+   return
+   
 M:
     movlw   00000000B
     movwf   LATD, A
@@ -850,8 +945,121 @@ C_:
     movwf   LATD, A
     call    GLCD_write_d
     return
+   
+Y:
+    movlw   00000000B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   00000100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   00001000B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01110000B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01110000B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   00001000B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   00000100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   00000000B
+    movwf   LATD, A
+    call    GLCD_write_d
+    return
+    
+COLON:
+    movlw   00000000B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   0100100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   00000000B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   00000000B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   00000000B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   00000000B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   00000000B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   00000000B
+    movwf   LATD, A
+    call    GLCD_write_d
+    return
 
+_7:
+    movlw   00000000B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01000100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   00100100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   00010100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   00001100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   00000100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   00000000B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   00000000B
+    movwf   LATD, A
+    call    GLCD_write_d
+    return
+    
 GAP:
     movlw   0x01
     call    GLCD_remove_section
     return
+    
+menu_plus_options:
+	call	draw_menu	; displays menu
+	call	delay_menu	; waits for valid player input
+	movwf	key, A		; move input to key
+	movlw	play_key
+	cpfseq	key, A		; checks if player selected play
+	bra	options		; if not check next option
+;	call	run_game	; run game
+	return			; restart
+options:
+	movlw	options_key
+	cpfseq	key, A		; checks if player selected options
+	bra	leader		; if not go to leaderboard
+	call	open_options	; open options menu
+	return			; restart
+leader:
+	call	open_leader	; open leaderboard
+	return			; restart
+
+open_options:
+	call	GLCD_fill_0
+	movlw	10
+	call	long_delay
+	return
+	
+open_leader:
+	call	GLCD_fill_0
+	call	draw_player
+	movlw	10
+	call	long_delay
+	return
