@@ -10,8 +10,8 @@ extrn	GLCD_setup, GLCD_fill_0, GLCD_fill_1
 extrn	delay_ms, delay_x4us, delay, long_delay, delay_key_press, delay_menu
 extrn	init_player, draw_player, inc_player_y
 extrn	keyboard_setup
-extrn	draw_menu
-extrn	load_level, draw_level
+extrn	draw_menu, menu_plus_options, draw_end_screen
+extrn	load_level, draw_level, check_collision
     
 global	time
 ; ====== SETUP ======  
@@ -20,6 +20,7 @@ psect	udata_acs   ; reserve data space in access ram
 counter:    ds 1    ; reserve one byte for a counter variable
 key:	    ds 1
 time:	    ds 1
+collision:  ds 1
 	play_key	equ	'A'
 	options_key	equ	'B'
 	leader_key	equ	'C'
@@ -54,7 +55,12 @@ main:
 	call	draw_level
 ;	movlw	0x28
 ;	call	delay_ms
-	movlw	1
+	call	check_collision
+	movwf	collision, A
+	movlw	0
+	cpfseq	collision, A
+	bra	end_game
+	movlw	3
 	call	delay_key_press
 	
 ;	call	GLCD_fill_0
@@ -63,48 +69,18 @@ main:
 ;	call	delay_key_press
 	
 	incf	time, F, A
+	incf	time, F, A
 	bra main
-	
+end_game:
+	movlw	0x1
+	call	long_delay
+	call	GLCD_fill_0
+	call	draw_end_screen
+	movlw	0x1
+	call	long_delay
+	goto	setup
+    
 ; ====== END OF MAIN PART ======
-menu_plus_options:
-	call	draw_menu	; displays menu
-	call	delay_menu	; waits for valid player input
-	movwf	key, A		; move input to key
-	movlw	play_key
-	cpfseq	key, A		; checks if player selected play
-	bra	options		; if not check next option
-;	call	run_game	; run game
-	return			; restart
-options:
-	movlw	options_key
-	cpfseq	key, A		; checks if player selected options
-	bra	leader		; if not go to leaderboard
-	call	open_options	; open options menu
-	return			; restart
-leader:
-	call	open_leader	; open leaderboard
-	return			; restart
-	
-run_game:
-	call	GLCD_fill_0
-	call	draw_player
-game_loop:
-	movlw	10
-	call	delay_key_press
-	bra	game_loop
-	return
 
-open_options:
-	call	GLCD_fill_0
-	movlw	10
-	call	long_delay
-	return
-	
-open_leader:
-	call	GLCD_fill_0
-	call	draw_player
-	movlw	10
-	call	long_delay
-	return
 	
 	end	rst
