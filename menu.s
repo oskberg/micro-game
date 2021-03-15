@@ -288,7 +288,6 @@ draw_menu:  ; draws the main menu
    movlw    0x00
    movwf    y_pos, A
    call	    GLCD_set_y
-   call	    GLCD_set_x
    call	    T
    movlw    0x08
    movwf    y_pos, A
@@ -371,58 +370,10 @@ draw_menu:  ; draws the main menu
    call	    GLCD_set_y
    call	    D
    
-   ; for testing numbers line 7
-   call	    GLCD_left
-   movlw    0x07
-   movwf    x_pos, A
-   call	    GLCD_set_x
-   movlw    0x00
-   movwf    y_pos, A
-   call	    GLCD_set_y
-   call	    _1
-   movlw    0x08
-   movwf    y_pos, A
-   call	    GLCD_set_y
-   call	    _2
-   movlw    0x10
-   movwf    y_pos, A
-   call	    GLCD_set_y
-   call	    _3
-   movlw    0x18
-   movwf    y_pos, A
-   call	    GLCD_set_y
-   call	    _4
-   movlw    0x20
-   movwf    y_pos, A
-   call	    GLCD_set_y
-   call	    _5
-   movlw    0x28
-   movwf    y_pos, A
-   call	    GLCD_set_y
-   call	    _6
-   movlw    0x30
-   movwf    y_pos, A
-   call	    GLCD_set_y
-   call	    _7
-   movlw    0x38
-   movwf    y_pos, A
-   call	    GLCD_set_y
-   call	    _8
-   call	    GLCD_right
-   movlw    0x00
-   movwf    y_pos, A
-   call	    GLCD_set_y
-   call	    GLCD_set_x
-   call	    _9
-   movlw    0x08
-   movwf    y_pos, A
-   call	    GLCD_set_y
-   call	    _0
-   
    return
 
 draw_end_screen:
-    ; writes "main menu" to top line
+    ; writes "game over" to top line
    call	    GLCD_left
    movlw    0x00
    movwf    x_pos, A
@@ -430,23 +381,23 @@ draw_end_screen:
    movlw    0x00
    movwf    y_pos, A
    call	    GLCD_set_y
-   call	    Y
+   call	    G
    movlw    0x08
    movwf    y_pos, A
    call	    GLCD_set_y
-   call	    O
+   call	    A_
    movlw    0x10
    movwf    y_pos, A
    call	    GLCD_set_y
-   call	    U
+   call	    M
    movlw    0x18
    movwf    y_pos, A
    call	    GLCD_set_y
-   call	    GAP
+   call	    E
    movlw    0x20
    movwf    y_pos, A
    call	    GLCD_set_y
-   call	    L
+   call	    GAP
    movlw    0x28
    movwf    y_pos, A
    call	    GLCD_set_y
@@ -454,13 +405,19 @@ draw_end_screen:
    movlw    0x30
    movwf    y_pos, A
    call	    GLCD_set_y
-   call	    S
+   call	    V
    movlw    0x38
    movwf    y_pos, A
    call	    GLCD_set_y
    call	    E
+   call	    GLCD_right
+   movlw    0x00
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    R
 
    ; display 'score: x'
+   call	    GLCD_left
    movlw    0x03
    movwf    x_pos, A
    call	    GLCD_set_x
@@ -513,10 +470,13 @@ M:
     movlw   00000000B
     movwf   LATD, A
     call    GLCD_write_d
-    movlw   01111110B
+    movlw   01111100B
     movwf   LATD, A
     call    GLCD_write_d
-    movlw   00000100B
+    movlw   00001000B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   00010000B
     movwf   LATD, A
     call    GLCD_write_d
     movlw   00001000B
@@ -525,10 +485,7 @@ M:
     movlw   00000100B
     movwf   LATD, A
     call    GLCD_write_d
-    movlw   00000010B
-    movwf   LATD, A
-    call    GLCD_write_d
-    movlw   01111110B
+    movlw   01111100B
     movwf   LATD, A
     call    GLCD_write_d
     movlw   00000000B
@@ -1022,6 +979,33 @@ Y:
     call    GLCD_write_d
     return
     
+G:
+    movlw   00000000B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01111100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01000100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01010100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01010100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01010100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01110100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   00000000B
+    movwf   LATD, A
+    call    GLCD_write_d
+    return
+    
 COLON:
     movlw   00000000B
     movwf   LATD, A
@@ -1049,33 +1033,6 @@ COLON:
     call    GLCD_write_d
     return
 
-_1:
-    movlw   00000000B
-    movwf   LATD, A
-    call    GLCD_write_d
-    movlw   00000000B
-    movwf   LATD, A
-    call    GLCD_write_d
-    movlw   00000000B
-    movwf   LATD, A
-    call    GLCD_write_d
-    movlw   01000100B
-    movwf   LATD, A
-    call    GLCD_write_d
-    movlw   01111100B
-    movwf   LATD, A
-    call    GLCD_write_d
-    movlw   01000000B
-    movwf   LATD, A
-    call    GLCD_write_d
-    movlw   00000000B
-    movwf   LATD, A
-    call    GLCD_write_d
-    movlw   00000000B
-    movwf   LATD, A
-    call    GLCD_write_d
-    return  
-    
 _1:
     movlw   00000000B
     movwf   LATD, A
@@ -1134,9 +1091,6 @@ _3:
     movlw   00000000B
     movwf   LATD, A
     call    GLCD_write_d
-    movlw   01110100B
-    movwf   LATD, A
-    call    GLCD_write_d
     movlw   01010100B
     movwf   LATD, A
     call    GLCD_write_d
@@ -1149,7 +1103,10 @@ _3:
     movlw   01010100B
     movwf   LATD, A
     call    GLCD_write_d
-    movlw   01011100B
+    movlw   01010100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01111100B
     movwf   LATD, A
     call    GLCD_write_d
     movlw   00000000B
@@ -1157,6 +1114,192 @@ _3:
     call    GLCD_write_d
     return
     
+_4:
+    movlw   00000000B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   00100000B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   00110000B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   00101000B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   00100100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01111100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   00100000B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   00000000B
+    movwf   LATD, A
+    call    GLCD_write_d
+    return
+_5:
+    movlw   00000000B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01011100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01010100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01010100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01010100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01010100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   00100100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   00000000B
+    movwf   LATD, A
+    call    GLCD_write_d
+    return
+    
+_6:
+    movlw   00000000B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01111100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01010100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01010100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01010100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01010100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01110100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   00000000B
+    movwf   LATD, A
+    call    GLCD_write_d
+    return
+    
+_7:
+    movlw   00000000B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   00000100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01000100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   00100100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   00010100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   00001100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   00000100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   00000000B
+    movwf   LATD, A
+    call    GLCD_write_d
+    return  
+    
+_8:
+    movlw   00000000B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01111100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01010100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01010100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01010100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01010100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01111100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   00000000B
+    movwf   LATD, A
+    call    GLCD_write_d
+    return
+_9:
+    movlw   00000000B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01011100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01010100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01010100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01010100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01010100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01111100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   00000000B
+    movwf   LATD, A
+    call    GLCD_write_d
+    return
+    
+_0:
+    movlw   00000000B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01111100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01000100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01000100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01000100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01000100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   01111100B
+    movwf   LATD, A
+    call    GLCD_write_d
+    movlw   00000000B
+    movwf   LATD, A
+    call    GLCD_write_d
+    return
 GAP:
     movlw   0x01
     call    GLCD_remove_section

@@ -223,6 +223,7 @@ check_collision:
 	addwf	object_width, W, A
 	movwf	current_obj_y, A
 	movf	player_y, W, A
+	addlw	0x01
 	cpfslt	current_obj_y, A
 	bra	check_gap
 	retlw	0
