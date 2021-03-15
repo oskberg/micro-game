@@ -12,8 +12,10 @@ extrn	init_player, draw_player, inc_player_y
 extrn	keyboard_setup
 extrn	draw_menu, menu_plus_options, draw_end_screen
 extrn	load_level, draw_level, check_collision
+extrn	check_collision_break
     
-global	time
+; TODO: i dont like that the end game thing has to be exported...
+global	time, collision, end_game
 ; ====== SETUP ======  
 ;    Code which prepares the micro processor to run the game
 psect	udata_acs   ; reserve data space in access ram
@@ -55,14 +57,15 @@ main:
 	call	draw_level
 ;	movlw	0x28
 ;	call	delay_ms
-	call	check_collision
-	movwf	collision, A
-	movlw	0
-	cpfseq	collision, A
-	bra	end_game
-	movlw	3
-	call	delay_key_press
+;	call	check_collision
+;	movwf	collision, A
+;	movlw	0
+;	cpfseq	collision, A
+;	bra	end_game
+	call	check_collision_break
 	
+	movlw	5
+	call	delay_key_press
 ;	call	GLCD_fill_0
 ;	call	draw_player
 ;	movlw	10
@@ -70,7 +73,12 @@ main:
 	
 	incf	time, F, A
 	incf	time, F, A
+	incf	time, F, A
+	incf	time, F, A
+
+
 	bra main
+	
 end_game:
 	movlw	0x1
 	call	long_delay

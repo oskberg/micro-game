@@ -82,7 +82,7 @@ check_if_down:
 	bra	delay_x10ms_2	; if not continue loop
 	call	move_player_down    ; move player down
 delay_x10ms_2:			; continue loop
-	movlw	0x0A
+	movlw	0x14
 	call	delay_ms	; 10ms delay
 	decfsz	cnt_x10ms, A	; check if # loops = w
 	bra	delay_x10ms	; loop
