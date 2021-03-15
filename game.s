@@ -211,6 +211,14 @@ check_collision:
 	cpfslt	current_obj_y, A
 	retlw	0
 	
+	movf	current_obj_y, W, A
+	addwf	object_width, W, A
+	movwf	current_obj_y, A
+	movf	player_y, W, A
+	cpfslt	current_obj_y, A
+	bra	check_gap
+	retlw	0
+check_gap:
 	lfsr	0, current_gaps	    ; load lsfr 0 which holds the gaps
 	movf	first_object, W, A
 	addwf	FSR0, F, A
