@@ -16,6 +16,7 @@ psect	udata_acs   ; named variables in access ram
 player_x:	ds 1
 player_y:	ds 1
 temp_count:	ds 1
+score:		ds 1
 
     player_width	equ 0x0A
 
@@ -99,6 +100,7 @@ ll_loop:
 	movlw	0x00
 ;	movwf	time_step, A	; set time to 0
 	movwf	first_object, A
+	movwf	score, A
 	movlw	0x08		
 	movwf	object_width, A	; set object with to 8 pixels
 	movlw	24
@@ -119,7 +121,7 @@ draw_level:
 	movlw	0x00
 	movwf	time, A
 	incf	first_object, F, A
-	
+	incf	score, A
 	; loop over all objects to draw 
 ;	movlb	0x01
 ;	movf	current_gaps, W, B
