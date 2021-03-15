@@ -35,9 +35,9 @@ current_gaps:	ds  20	    ; reserve some space for the current level
     ; Store the gaps of the obstacles in program memory as a level
 psect	data
 gap_pages: 
-	db  4,2,6,3,0xa    ; level with terminator
+	db  4,2,6,3,1,6,4,7,1,4,3,6,5,1,4,3,2,5,3,2,3,4,3,0xa    ; level with terminator
 	
-	gaps_len    equ	4
+	gaps_len    equ	24
 	align	2
 	
 ; =========================
@@ -108,20 +108,35 @@ ll_loop:
 	return	0
 	
 draw_level:
+    	; reset time if equal to 1 period
+	movf	object_T, W, A
+;	addwf	object_T, W, A
+	cpfseq	time, A
+	bra	dlsp
+	
+	; this bit if time is equal to period
+;	movff	object_T, time
+	movlw	0x00
+	movwf	time, A
+	incf	first_object, F, A
+	
 	; loop over all objects to draw 
 ;	movlb	0x01
 ;	movf	current_gaps, W, B
 ;	movlb	0x00
-	movlw	0x00
+dlsp:	movlw	0x00
 	movwf	draw_count, A
+	lfsr	0, current_gaps	    ; load lsfr 0 which holds the gaps
+	movf	first_object, W, A
+	addwf	FSR0, F, A
 dlloop:	
-	movlw	0x03
+	movf	POSTINC0, W, A  ; move gap at lsfr0 into current_gap
 	movwf	current_gap, A
 	
- 	movf	object_T, W, A
+	movf	object_T, W, A	; skip here if not equal to period
 	mulwf	draw_count, A
 	movf	PRODL, W, A
-	addlw	0x20	
+	addwf	object_T, W, A
 	subwf	time, W, A
 	sublw	0x00
 	movwf	current_obj_y, A
@@ -131,12 +146,15 @@ dlloop:
 	movlw	0x08
 	movwf	x_count, A
 	
+	movlw	120	; 64+64 - object_width
+	cpfsgt	current_obj_y, A    ; if y position outside of screen, don't draw it
 	call	draw_object
 	
 	incf	draw_count, F, A
-	movlw	0x03
+	movlw	0x05		; max number of objects on the screen at once
 	cpfsgt	draw_count, A
 	bra	dlloop
+	
 	return	0
 
 	

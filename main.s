@@ -39,7 +39,7 @@ setup:
 	call	GLCD_setup
 	call	init_player
 	call	keyboard_setup
-;	call	menu_plus_options   ; displays options then waits for input
+	call	menu_plus_options   ; displays options then waits for input
 	goto	main
 ; ====== END OF SETUP ======
 	
@@ -54,7 +54,7 @@ main:
 	call	draw_level
 ;	movlw	0x28
 ;	call	delay_ms
-	movlw	10
+	movlw	1
 	call	delay_key_press
 	
 ;	call	GLCD_fill_0
