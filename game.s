@@ -6,16 +6,18 @@
 
 ; ====== IMPORTS/EXPORTS ======
 global	init_player, draw_player, inc_player_y, move_player_up, move_player_down
-global	draw_object, load_level, draw_level, check_collision
+global	draw_object, load_level, draw_level, check_collision, check_collision_break
     
 extrn	GLCD_fill_section, GLCD_left, GLCD_right, GLCD_fill_page_whole, GLCD_remove_section, GLCD_set_x, GLCD_set_y
-extrn	x_pos, y_pos, y_pos_t, time
+extrn	end_game
+extrn	x_pos, y_pos, y_pos_t, time, collision
 ; ====== VARIABLE DECLARATIONS ======
     
 psect	udata_acs   ; named variables in access ram
 player_x:	ds 1
 player_y:	ds 1
 temp_count:	ds 1
+score:		ds 1
 
     player_width	equ 0x08
 
@@ -62,6 +64,9 @@ draw_player:
 	movlw	player_width
 	
 	call	GLCD_fill_section
+	movf	x_pos, W, A
+	movwf	player_x, A
+;	movff	x_pos, player_x
 	return	0
 
 inc_player_y:    ; move player 1 step in y with wrapping edge
@@ -99,6 +104,7 @@ ll_loop:
 	movlw	0x00
 ;	movwf	time_step, A	; set time to 0
 	movwf	first_object, A
+	movwf	score, A	
 	movlw	0x04		
 	movwf	object_width, A	; set object with to 8 pixels
 	movlw	24
@@ -119,7 +125,7 @@ draw_level:
 	movlw	0x00
 	movwf	time, A
 	incf	first_object, F, A
-	
+	incf	score, A
 	; loop over all objects to draw 
 ;	movlb	0x01
 ;	movf	current_gaps, W, B
@@ -193,6 +199,7 @@ move_player_up:	    ; move player 1 square up
 	call	clear_player
 	decf	player_x, F, A	    ; decrament x position
 	call	draw_player
+	call	check_collision_break
 	return	0
 	
 	
@@ -200,6 +207,7 @@ move_player_down:   ; move player 1 square down
 	call	clear_player
 	incf	player_x, F, A	    ; incrament x position
 	call	draw_player
+	call	check_collision_break
 	return	0
 
 check_collision: 
@@ -228,3 +236,11 @@ check_gap:
 	cpfseq	current_gap, A
 	retlw	1
 	retlw	0
+
+check_collision_break:
+	call	check_collision
+	movwf	collision, A
+	movlw	0
+	cpfseq	collision, A
+	goto	end_game
+	return	0
