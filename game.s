@@ -9,7 +9,7 @@ global	init_player, draw_player, inc_player_y, move_player_up, move_player_down
 global	draw_object, load_level, draw_level
     
 extrn	GLCD_fill_section, GLCD_left, GLCD_right, GLCD_fill_page_whole, GLCD_remove_section, GLCD_set_x, GLCD_set_y
-extrn	x_pos, y_pos, y_pos_t
+extrn	x_pos, y_pos, y_pos_t, time
 ; ====== VARIABLE DECLARATIONS ======
     
 psect	udata_acs   ; named variables in access ram
@@ -22,7 +22,6 @@ temp_count:	ds 1
 psect	udata_acs
 first_object:	ds  1
 draw_count:	ds  1
-time_step:	ds  1
 object_T:	ds  1
 object_width:	ds  1
 current_obj_y:	ds  1
@@ -98,7 +97,7 @@ ll_loop:
 	; TODO: make specific to level
 ;	movlb	0x01	; level variables in bank 1
 	movlw	0x00
-	movwf	time_step, A	; set time to 0
+;	movwf	time_step, A	; set time to 0
 	movwf	first_object, A
 	movlw	0x08		
 	movwf	object_width, A	; set object with to 8 pixels
@@ -123,6 +122,8 @@ dlloop:
 	mulwf	draw_count, A
 	movf	PRODL, W, A
 	addlw	0x20	
+	subwf	time, W, A
+	sublw	0x00
 	movwf	current_obj_y, A
 	
 	movlw	0x00

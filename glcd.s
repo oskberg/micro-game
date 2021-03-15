@@ -127,11 +127,18 @@ GLCD_fill_page_whole: ; fills a page at x_pos from pos_y to pos_y + w
 	movwf	y_counter, A	; set witdth
 	call	GLCD_left_simp	; set to left screen
 	call	GLCD_set_x
+	
+	; set change half if necessary
+	movlw	63
+	cpfslt	y_pos, A
+	call	GLCD_right_dec	    ; set y_pos and screen half correctly	
+
 	call	GLCD_set_y
 ;	movlw	64
 ;	cpfslt	y_pos, A
 ;	call	GLCD_right_dec	    ; set y_pos and screen half correctly
 yLoopAdressW:	; loop over y coordinates
+	; check if half needs to ba changed during operation
 	movlw	63
 	cpfslt	y_pos, A
 	call	GLCD_right_dec	    ; set y_pos and screen half correctly	
