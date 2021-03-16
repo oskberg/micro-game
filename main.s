@@ -10,9 +10,12 @@ extrn	GLCD_setup, GLCD_fill_0, GLCD_fill_1
 extrn	delay_ms, delay_x4us, delay, long_delay, delay_key_press, delay_menu
 extrn	init_player, draw_player, inc_player_y
 extrn	keyboard_setup
-extrn	draw_menu, menu_plus_options, draw_end_screen
+extrn	draw_menu, menu_plus_options, draw_end_screen, draw_victory_screen
 extrn	load_level, draw_level, check_collision
 extrn	check_collision_break
+extrn	reset_score, load_level_1, load_level_2, load_level_3
+extrn	first_object, level_1_len, level_2_len, level_3_len, play_frame, play_levels
+extrn	draw_level_1_screen, draw_level_2_screen, draw_level_3_screen
     
 ; TODO: i dont like that the end game thing has to be exported...
 global	time, collision, end_game
@@ -26,7 +29,7 @@ collision:  ds 1
 	play_key	equ	'A'
 	options_key	equ	'B'
 	leader_key	equ	'C'
-	time_inc	equ	4
+
 
 psect	code, abs	
 rst: 	org 0x0
@@ -39,7 +42,8 @@ setup:
 	movlw	0x00
 	movwf	time, A
 
-	call	load_level
+;	call	load_level
+	call	reset_score
 	call	GLCD_setup
 	call	init_player
 	call	keyboard_setup
@@ -50,25 +54,23 @@ setup:
 ; ====== MAIN PART ======
 ; Runs the game in a loop?
 main:
-	call	GLCD_fill_0
-	call	draw_player
-	call	draw_level
-
-	call	check_collision_break
-	
-	movlw	5
-	call	delay_key_press
-
-	movlw	time_inc
-	addwf	time, F, A
-
-	bra main
+	call	play_levels
+	bra	won_game
 	
 end_game:
 	movlw	0x1
 	call	long_delay
 	call	GLCD_fill_0
 	call	draw_end_screen
+	movlw	0x1
+	call	long_delay
+	goto	setup
+	
+won_game:
+	movlw	0x1
+	call	long_delay
+	call	GLCD_fill_0
+	call	draw_victory_screen
 	movlw	0x1
 	call	long_delay
 	goto	setup

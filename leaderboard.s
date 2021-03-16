@@ -1,7 +1,7 @@
 #include <xc.inc>
 
 ; ====== COMMENTS ======
-;    This file contains subroutines relating specifically to the game
+;    This file contains subroutines relating to displaying the score
 ; ====== END OF COMMENTS ======
 
 ; ====== IMPORTS/EXPORTS ======

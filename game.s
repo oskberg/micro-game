@@ -7,11 +7,16 @@
 ; ====== IMPORTS/EXPORTS ======
 global	init_player, draw_player, inc_player_y, move_player_up, move_player_down
 global	draw_object, load_level, draw_level, check_collision, check_collision_break
-global	score
+global	score, reset_score, load_level_1, load_level_2, load_level_3
+global	first_object, level_1_len, level_2_len, level_3_len, play_frame, play_levels
     
 extrn	GLCD_fill_section, GLCD_left, GLCD_right, GLCD_fill_page_whole, GLCD_remove_section, GLCD_set_x, GLCD_set_y
 extrn	end_game
 extrn	x_pos, y_pos, y_pos_t, time, collision
+extrn	GLCD_fill_0
+extrn	delay_key_press, long_delay
+extrn	draw_level_1_screen, draw_level_2_screen, draw_level_3_screen
+
 ; ====== VARIABLE DECLARATIONS ======
     
 psect	udata_acs   ; named variables in access ram
@@ -23,7 +28,16 @@ score:		ds 1
     player_width	equ 0x08
     width_object	equ 0x04
     object_separation	equ 0x18
-
+    width_object_1	equ 0x04
+    object_separation_1	equ 0x18
+    time_inc_1		equ 2
+    width_object_2	equ 0x04
+    object_separation_2	equ 0x14
+    time_inc_2		equ 4
+    width_object_3	equ 0x04
+    object_separation_3	equ 0x14
+    time_inc_3		equ 5
+    	
 psect	udata_acs
 first_object:	ds  1
 draw_count:	ds  1
@@ -32,6 +46,8 @@ object_width:	ds  1
 current_obj_y:	ds  1
 x_count:	ds  1
 current_gap:	ds  1
+time_inc:	ds  1
+speed_key_press:ds  1
     
 psect	udata_bank1
 current_gaps:	ds  20	    ; reserve some space for the current level
@@ -44,6 +60,21 @@ gap_pages:
 	
 	gaps_len    equ	24
 	align	2
+	
+level_1:
+	db  1,2,3,4,2,6,3,1,7,6,7,3,2,5,4,3,7,1,5,1,5,2,7,0xa    ; level with terminator
+;	db  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0xa    ; level with terminator	
+	level_1_len	    equ 24
+	    
+level_2:
+	db  2,3,2,6,1,2,7,5,4,5,3,1,5,1,2,3,1,5,1,3,6,4,7,0xa    ; level with terminator
+;	db  2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,0xa    ; level with terminator
+	level_2_len	    equ 24
+	    
+level_3:
+	db  3,7,3,6,3,5,3,4,3,2,3,1,3,7,4,2,5,3,1,5,3,7,1,0xa    ; level with terminator
+;	db  3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0xa    ; level with terminator
+	level_3_len	    equ 24
 	
 ; =========================
 ; ====== SUBROUTINES ======
@@ -107,7 +138,7 @@ ll_loop:
 	movlw	0x00
 ;	movwf	time_step, A	; set time to 0
 	movwf	first_object, A
-	movwf	score, A	
+;	movwf	score, A	
 ;	movlw	0x04
 	movlw	width_object
 	movwf	object_width, A	; set object with to 8 pixels
@@ -116,6 +147,117 @@ ll_loop:
 	movwf	object_T, A	; set object separation to 24 pixels
 ;	movlb	0x00		; reset bank
 
+	return	0
+	
+reset_score:
+	movlw	0x00
+	movwf	score, A
+	return	0
+	
+load_level_1:	; much of this is taken from the lab exercises!!!
+	lfsr	0, current_gaps	; Load FSR0 with address in RAM	
+	movlw	low highword(level_1)	; address of data in PM
+	movwf	TBLPTRU, A		; load upper bits to TBLPTRU
+	movlw	high(level_1)		; address of data in PM
+	movwf	TBLPTRH, A		; load high byte to TBLPTRH
+	movlw	low(level_1)		; address of data in PM
+	movwf	TBLPTRL, A		; load low byte to TBLPTRL
+	movlw	level_1_len		; bytes to read
+	movwf 	temp_count, A		; our counter register
+ll_1_loop:
+        tblrd*+				; one byte from PM to TABLAT, increment TBLPRT
+	movff	TABLAT, POSTINC0	; move data from TABLAT to (FSR0), inc FSR0	
+	decfsz	temp_count, A		; count down to zero
+	bra	ll_1_loop			; keep going until finished
+	
+	; set up level variables. CURRENTLY HARD CODED
+	; TODO: make specific to level
+;	movlb	0x01	; level variables in bank 1
+	movlw	0x00
+;	movwf	time_step, A	; set time to 0
+	movwf	first_object, A
+;	movwf	score, A	
+;	movlw	0x04
+	movlw	width_object_1
+	movwf	object_width, A	; set object with to 8 pixels
+;	movlw	24
+	movlw	object_separation_1
+	movwf	object_T, A	; set object separation to 24 pixels
+;	movlb	0x00		; reset bank
+	movlw	time_inc_1
+	sublw	0x00
+	movwf	time, A
+
+	return	0	
+	
+load_level_2:	; much of this is taken from the lab exercises!!!
+	lfsr	0, current_gaps	; Load FSR0 with address in RAM	
+	movlw	low highword(level_2)	; address of data in PM
+	movwf	TBLPTRU, A		; load upper bits to TBLPTRU
+	movlw	high(level_2)		; address of data in PM
+	movwf	TBLPTRH, A		; load high byte to TBLPTRH
+	movlw	low(level_2)		; address of data in PM
+	movwf	TBLPTRL, A		; load low byte to TBLPTRL
+	movlw	level_2_len		; bytes to read
+	movwf 	temp_count, A		; our counter register
+ll_2_loop:
+        tblrd*+				; one byte from PM to TABLAT, increment TBLPRT
+	movff	TABLAT, POSTINC0	; move data from TABLAT to (FSR0), inc FSR0	
+	decfsz	temp_count, A		; count down to zero
+	bra	ll_2_loop			; keep going until finished
+	
+	; set up level variables. CURRENTLY HARD CODED
+	; TODO: make specific to level
+;	movlb	0x01	; level variables in bank 1
+	movlw	0x00
+;	movwf	time_step, A	; set time to 0
+	movwf	first_object, A
+;	movwf	score, A	
+;	movlw	0x04
+	movlw	width_object_2
+	movwf	object_width, A	; set object with to 8 pixels
+;	movlw	24
+	movlw	object_separation_2
+	movwf	object_T, A	; set object separation to 24 pixels
+;	movlb	0x00		; reset bank
+	movlw	time_inc_2
+	sublw	0x00
+	movwf	time, A
+	return	0
+	
+load_level_3:	; much of this is taken from the lab exercises!!!
+	lfsr	0, current_gaps	; Load FSR0 with address in RAM	
+	movlw	low highword(level_3)	; address of data in PM
+	movwf	TBLPTRU, A		; load upper bits to TBLPTRU
+	movlw	high(level_3)		; address of data in PM
+	movwf	TBLPTRH, A		; load high byte to TBLPTRH
+	movlw	low(level_3)		; address of data in PM
+	movwf	TBLPTRL, A		; load low byte to TBLPTRL
+	movlw	level_3_len		; bytes to read
+	movwf 	temp_count, A		; our counter register
+ll_3_loop:
+        tblrd*+				; one byte from PM to TABLAT, increment TBLPRT
+	movff	TABLAT, POSTINC0	; move data from TABLAT to (FSR0), inc FSR0	
+	decfsz	temp_count, A		; count down to zero
+	bra	ll_3_loop			; keep going until finished
+	
+	; set up level variables. CURRENTLY HARD CODED
+	; TODO: make specific to level
+;	movlb	0x01	; level variables in bank 1
+	movlw	0x00
+;	movwf	time_step, A	; set time to 0
+	movwf	first_object, A
+;	movwf	score, A	
+;	movlw	0x04
+	movlw	width_object_3
+	movwf	object_width, A	; set object with to 8 pixels
+;	movlw	24
+	movlw	object_separation_3
+	movwf	object_T, A	; set object separation to 24 pixels
+;	movlb	0x00		; reset bank
+	movlw	time_inc_3
+	sublw	0x00
+	movwf	time, A
 	return	0
 	
 draw_level:
@@ -250,3 +392,72 @@ check_collision_break:
 	cpfseq	collision, A
 	goto	end_game
 	return	0
+
+play_frame:
+	call	GLCD_fill_0
+	call	draw_player
+	call	draw_level
+
+	call	check_collision_break
+	
+	movf	speed_key_press, W, A
+	call	delay_key_press
+	
+	movf	time_inc, W, A
+	addwf	time, F, A
+	return
+
+play_levels:
+    	call	GLCD_fill_0
+	call	draw_level_1_screen
+	movlw	0x01
+	call	long_delay
+	call	load_level_1
+	movlw	time_inc_1
+	movwf	time_inc, A
+	movlw	0x05
+	movwf	speed_key_press, A
+	
+level_1_play:
+	call	play_frame
+	movlw	0x01
+	sublw	level_1_len
+	cpfseq	first_object, A
+	bra	level_1_play
+	
+level_2_draw:
+	call	GLCD_fill_0
+	call	draw_level_2_screen
+	movlw	0x01
+	call	long_delay	
+	call	load_level_2
+	movlw	time_inc_2
+	movwf	time_inc, A
+	movlw	0x04
+	movwf	speed_key_press, A
+	
+level_2_play:
+	call	play_frame
+	movlw	0x01
+	sublw	level_2_len
+	cpfseq	first_object, A
+	bra	level_2_play
+	
+level_3_draw:
+	call	GLCD_fill_0	
+	call	draw_level_3_screen
+	movlw	0x01
+	call	long_delay	
+	call	load_level_3
+	movlw	time_inc_3
+	movwf	time_inc, A
+	movlw	0x03
+	movwf	speed_key_press, A	
+	
+level_3_play:
+	call	play_frame
+	movlw	0x01
+	sublw	level_3_len
+	cpfseq	first_object, A
+	bra	level_3_play
+	return
