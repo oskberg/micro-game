@@ -11,9 +11,11 @@ extrn	x_pos, y_pos
 extrn	delay_ms, delay_x4us, delay, long_delay, delay_key_press, delay_menu
 extrn	GLCD_setup, GLCD_fill_0, GLCD_fill_1
 extrn	init_player, draw_player, inc_player_y
-
+extrn	setup_score, write_digit_1, write_digit_2, write_digit_3, write_digit_4
+    
 
 global	draw_menu, menu_plus_options, draw_end_screen
+global	_0, _1, _2, _3, _4, _5, _6, _7, _8, _9
     
 ; =========================
 ; ====== SUBROUTINES ======
@@ -373,6 +375,7 @@ draw_menu:  ; draws the main menu
    return
 
 draw_end_screen:
+   call	    setup_score
     ; writes "game over" to top line
    call	    GLCD_left
    movlw    0x00
@@ -452,18 +455,20 @@ draw_end_screen:
    movlw    0x38
    movwf    y_pos, A
    call	    GLCD_set_y
-   call	    _7
-   
-;   call	    GLCD_right
-;   movlw    0x00
-;   movwf    y_pos, A
-;   call	    GLCD_set_y
-;   call	    GLCD_set_x
-;   call	    GAP
-;   movlw    0x08
-;   movwf    y_pos, A
-;   call	    GLCD_set_y
-;   call	    _7
+   call	    write_digit_1
+   call	    GLCD_right
+   movlw    0x00
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    write_digit_2
+   movlw    0x08
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    write_digit_3
+   movlw    0x10
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    write_digit_4
    return
    
 M:

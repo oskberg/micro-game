@@ -26,6 +26,7 @@ collision:  ds 1
 	play_key	equ	'A'
 	options_key	equ	'B'
 	leader_key	equ	'C'
+	time_inc	equ	4
 
 psect	code, abs	
 rst: 	org 0x0
@@ -51,31 +52,15 @@ setup:
 main:
 	call	GLCD_fill_0
 	call	draw_player
-;	movlw	0x28
-;	call	delay_ms
-;	call	inc_player_y
 	call	draw_level
-;	movlw	0x28
-;	call	delay_ms
-;	call	check_collision
-;	movwf	collision, A
-;	movlw	0
-;	cpfseq	collision, A
-;	bra	end_game
+
 	call	check_collision_break
 	
 	movlw	5
 	call	delay_key_press
-;	call	GLCD_fill_0
-;	call	draw_player
-;	movlw	10
-;	call	delay_key_press
-	
-	incf	time, F, A
-	incf	time, F, A
-	incf	time, F, A
-	incf	time, F, A
 
+	movlw	time_inc
+	addwf	time, F, A
 
 	bra main
 	

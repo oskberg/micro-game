@@ -7,6 +7,7 @@
 ; ====== IMPORTS/EXPORTS ======
 global	init_player, draw_player, inc_player_y, move_player_up, move_player_down
 global	draw_object, load_level, draw_level, check_collision, check_collision_break
+global	score
     
 extrn	GLCD_fill_section, GLCD_left, GLCD_right, GLCD_fill_page_whole, GLCD_remove_section, GLCD_set_x, GLCD_set_y
 extrn	end_game
@@ -20,6 +21,8 @@ temp_count:	ds 1
 score:		ds 1
 
     player_width	equ 0x08
+    width_object	equ 0x04
+    object_separation	equ 0x18
 
 psect	udata_acs
 first_object:	ds  1
@@ -105,9 +108,11 @@ ll_loop:
 ;	movwf	time_step, A	; set time to 0
 	movwf	first_object, A
 	movwf	score, A	
-	movlw	0x04		
+;	movlw	0x04
+	movlw	width_object
 	movwf	object_width, A	; set object with to 8 pixels
-	movlw	24
+;	movlw	24
+	movlw	object_separation
 	movwf	object_T, A	; set object separation to 24 pixels
 ;	movlb	0x00		; reset bank
 

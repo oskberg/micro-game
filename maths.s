@@ -1,7 +1,9 @@
 #include <xc.inc>
     
 global  prod_1, prod_2, prod_3, prod_4, dec_1, dec_2, dec_3, dec_4, hex_to_dec
-global	mul_16_l_2, mul_16_h_2
+global	mul_16_l_2, mul_16_h_2, score_to_digits
+    
+extrn	score
     
 psect udata_acs
 mul_8:	    ds 1
@@ -40,7 +42,86 @@ psect	maths_code,class=CODE
 ;	movff	PRODL, mul_1, A
 ;	movff	PRODH, mul_2, A
 ;	return
-
+score_to_digits:
+    movf    score, W, A
+    movwf   temp_1, A
+    movlw   0x00
+    movwf   dec_1, A
+    movlw   0x00
+    movwf   dec_2, A
+    movlw   0x00
+    movwf   dec_3, A
+    movlw   0x00
+    movwf   dec_4, A
+;calc_digit_1:
+;    movlw   1000
+;    cpfsgt  temp_1, A
+;    bra	    check_1000
+;    incf    dec_1, F, A
+;    movlw   1000
+;    subwf   temp_1, F, A
+;    bra	    calc_digit_1
+;check_1000:
+;    movlw   1000
+;    cpfseq  temp_1, A
+;    bra	    calc_digit_2
+;    incf    dec_1, F, A
+;    movlw   0x00
+;    movwf   dec_2, A
+;    movlw   0x00
+;    movwf   dec_3, A
+;    movlw   0x00
+;    movwf   dec_4, A
+;    return
+calc_digit_2: 
+    movlw   100
+    cpfsgt  temp_1, A
+    bra	    check_100
+    incf    dec_2, F, A
+    movlw   100
+    subwf   temp_1, F, A
+    bra	    calc_digit_2
+check_100:
+    movlw   100
+    cpfseq  temp_1, A
+    bra	    calc_digit_3
+    incf    dec_2, F, A
+    movlw   0x00
+    movwf   dec_3, A
+    movlw   0x00
+    movwf   dec_4, A
+    return
+calc_digit_3:
+    movlw   10
+    cpfsgt  temp_1, A
+    bra	    check_10
+    incf    dec_3, F, A
+    movlw   10
+    subwf   temp_1, F, A
+    bra	    calc_digit_3
+check_10:
+    movlw   10
+    cpfseq  temp_1, A
+    bra	    calc_digit_4
+    incf    dec_3, F, A
+    movlw   0x00
+    movwf   dec_4, A
+    return
+calc_digit_4:
+    movlw   1
+    cpfsgt  temp_1, A
+    bra	    check_1
+    incf    dec_4, F, A
+    movlw   1
+    subwf   temp_1, F, A
+    bra	    calc_digit_4
+check_1:
+    movlw   1
+    cpfseq  temp_1, A
+    return
+    incf    dec_4, F, A
+    return
+    
 hex_to_dec: ; converts hex number stored in hex variables
 	; 1 - multiply x by k, take most signigicant bit
 	; 2-4 multiply x by 10 (0x0a) and take most significant bit
