@@ -64,7 +64,7 @@ gap_pages:
 level_1:
 	db  1,2,3,4,2,6,3,1,7,6,7,3,2,5,4,3,7,1,5,1,5,2,7,0xa    ; level with terminator
 ;	db  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0xa    ; level with terminator	
-	level_1_len	    equ 24
+	level_1_len	    equ 3
 	    
 level_2:
 	db  2,3,2,6,1,2,7,5,4,5,3,1,5,1,2,3,1,5,1,3,6,4,7,0xa    ; level with terminator
@@ -256,6 +256,7 @@ ll_3_loop:
 	movwf	object_T, A	; set object separation to 24 pixels
 ;	movlb	0x00		; reset bank
 	movlw	time_inc_3
+	addlw	time_inc_3
 	sublw	0x00
 	movwf	time, A
 	return	0
