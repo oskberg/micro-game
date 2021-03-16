@@ -15,7 +15,7 @@ extrn	end_game
 extrn	x_pos, y_pos, y_pos_t, time, collision
 extrn	GLCD_fill_0
 extrn	delay_key_press, long_delay
-extrn	draw_level_1_screen, draw_level_2_screen, draw_level_3_screen, display_score
+extrn	draw_level_1_screen, draw_level_2_screen, draw_level_3_screen, display_score, draw_level_4_screen
 
 ; ====== VARIABLE DECLARATIONS ======
     
@@ -35,8 +35,11 @@ score:		ds 1
     object_separation_2	equ 0x14
     time_inc_2		equ 4
     width_object_3	equ 0x04
-    object_separation_3	equ 0x14
-    time_inc_3		equ 5
+    object_separation_3	equ 0x10
+    time_inc_3		equ 4
+    width_object_4	equ 0x04
+    object_separation_4	equ 0x20
+    time_inc_4		equ 8
     	
 psect	udata_acs
 first_object:	ds  1
@@ -64,7 +67,7 @@ gap_pages:
 level_1:
 	db  1,2,3,4,2,6,3,1,7,6,7,3,2,5,4,3,7,1,5,1,5,2,7,0xa    ; level with terminator
 ;	db  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0xa    ; level with terminator	
-	level_1_len	    equ 3
+	level_1_len	    equ 2
 	    
 level_2:
 	db  2,3,2,6,1,2,7,5,4,5,3,1,5,1,2,3,1,5,1,3,6,4,7,0xa    ; level with terminator
@@ -72,9 +75,15 @@ level_2:
 	level_2_len	    equ 24
 	    
 level_3:
-	db  3,7,3,6,3,5,3,4,3,2,3,1,3,7,4,2,5,3,1,5,3,7,1,0xa    ; level with terminator
+	db  4,6,5,3,1,7,5,6,7,0,1,2,1,3,2,4,3,5,4,6,5,7,0,0xa
+;	db  3,7,3,6,3,5,3,4,3,2,3,1,3,7,4,2,5,3,1,5,3,7,1,0xa    ; level with terminator
 ;	db  3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0xa    ; level with terminator
 	level_3_len	    equ 24
+	    
+level_4:
+	db  3,7,3,6,3,5,3,4,1,5,2,6,7,3,0,5,1,3,7,2,4,7,1,0xa    ; level with terminator
+;	db  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,0xa    ; level with terminator
+	level_4_len	    equ 24
 	
 ; =========================
 ; ====== SUBROUTINES ======
@@ -261,6 +270,42 @@ ll_3_loop:
 	movwf	time, A
 	return	0
 	
+load_level_4:	; much of this is taken from the lab exercises!!!
+	lfsr	0, current_gaps	; Load FSR0 with address in RAM	
+	movlw	low highword(level_4)	; address of data in PM
+	movwf	TBLPTRU, A		; load upper bits to TBLPTRU
+	movlw	high(level_4)		; address of data in PM
+	movwf	TBLPTRH, A		; load high byte to TBLPTRH
+	movlw	low(level_4)		; address of data in PM
+	movwf	TBLPTRL, A		; load low byte to TBLPTRL
+	movlw	level_4_len		; bytes to read
+	movwf 	temp_count, A		; our counter register
+ll_4_loop:
+        tblrd*+				; one byte from PM to TABLAT, increment TBLPRT
+	movff	TABLAT, POSTINC0	; move data from TABLAT to (FSR0), inc FSR0	
+	decfsz	temp_count, A		; count down to zero
+	bra	ll_4_loop			; keep going until finished
+	
+	; set up level variables. CURRENTLY HARD CODED
+	; TODO: make specific to level
+;	movlb	0x01	; level variables in bank 1
+	movlw	0x00
+;	movwf	time_step, A	; set time to 0
+	movwf	first_object, A
+;	movwf	score, A	
+;	movlw	0x04
+	movlw	width_object_4
+	movwf	object_width, A	; set object with to 8 pixels
+;	movlw	24
+	movlw	object_separation_4
+	movwf	object_T, A	; set object separation to 24 pixels
+;	movlb	0x00		; reset bank
+	movlw	time_inc_4
+	addlw	time_inc_4
+	sublw	0x00
+	movwf	time, A
+	return	0
+	
 draw_level:
     	; reset time if equal to 1 period
 	movf	object_T, W, A
@@ -414,6 +459,7 @@ play_levels:
 	call	draw_level_1_screen
 	movlw	0x01
 	call	long_delay
+	call	init_player
 	call	load_level_1
 	movlw	time_inc_1
 	movwf	time_inc, A
@@ -432,6 +478,7 @@ level_2_draw:
 	call	draw_level_2_screen
 	movlw	0x01
 	call	long_delay	
+	call	init_player
 	call	load_level_2
 	movlw	time_inc_2
 	movwf	time_inc, A
@@ -446,14 +493,15 @@ level_2_play:
 	bra	level_2_play
 	
 level_3_draw:
-	call	GLCD_fill_0	
+	call	GLCD_fill_0
 	call	draw_level_3_screen
 	movlw	0x01
 	call	long_delay	
+	call	init_player
 	call	load_level_3
 	movlw	time_inc_3
 	movwf	time_inc, A
-	movlw	0x03
+	movlw	0x04
 	movwf	speed_key_press, A	
 	
 level_3_play:
@@ -462,4 +510,23 @@ level_3_play:
 	sublw	level_3_len
 	cpfseq	first_object, A
 	bra	level_3_play
+	
+level_4_draw:
+	call	GLCD_fill_0
+	call	draw_level_4_screen
+	movlw	0x01
+	call	long_delay	
+	call	init_player
+	call	load_level_4
+	movlw	time_inc_4
+	movwf	time_inc, A
+	movlw	0x04
+	movwf	speed_key_press, A	
+	
+level_4_play:
+	call	play_frame
+	movlw	0x01
+	sublw	level_4_len
+	cpfseq	first_object, A
+	bra	level_4_play
 	return
