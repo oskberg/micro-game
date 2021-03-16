@@ -18,6 +18,7 @@ global	draw_menu, menu_plus_options, draw_end_screen, draw_victory_screen
 global	_0, _1, _2, _3, _4, _5, _6, _7, _8, _9
 global	draw_level_1_screen, draw_level_2_screen, draw_level_3_screen
 global	write_instructions_menu
+global	display_score
     
 ; =========================
 ; ====== SUBROUTINES ======
@@ -2015,3 +2016,29 @@ open_leader:
 	movlw	10
 	call	long_delay
 	return
+	
+display_score:
+   call    setup_score
+    ; writes "game over" to top line
+   call	    GLCD_right
+   movlw    0x00
+   movwf    x_pos, A
+   call	    GLCD_set_x
+   movlw    0x20
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    write_digit_1
+   movlw    0x28
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    write_digit_2
+   movlw    0x30
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    write_digit_3
+   movlw    0x38
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    write_digit_4
+   return
+   

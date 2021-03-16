@@ -15,7 +15,7 @@ extrn	end_game
 extrn	x_pos, y_pos, y_pos_t, time, collision
 extrn	GLCD_fill_0
 extrn	delay_key_press, long_delay
-extrn	draw_level_1_screen, draw_level_2_screen, draw_level_3_screen
+extrn	draw_level_1_screen, draw_level_2_screen, draw_level_3_screen, display_score
 
 ; ====== VARIABLE DECLARATIONS ======
     
@@ -398,7 +398,8 @@ play_frame:
 	call	GLCD_fill_0
 	call	draw_player
 	call	draw_level
-
+	call	display_score
+	
 	call	check_collision_break
 	
 	movf	speed_key_press, W, A
