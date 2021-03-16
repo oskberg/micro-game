@@ -9,6 +9,9 @@ global	delay_ms, delay_x4us, delay, long_delay, delay_key_press, delay_menu
 
 extrn	button_press
 extrn	inc_player_y, move_player_up, move_player_down
+extrn	write_instructions_menu
+extrn	GLCD_fill_0
+extrn	draw_menu
     
 psect	udata_acs   ; named variables in access ram
 cnt_l:		ds 1   ; reserve 1 byte for variable LCD_cnt_l
@@ -23,8 +26,7 @@ input:		ds 1
 	up	equ	'2'	; key press to go up 
 	down	equ	'8'	; key press to go down
 	play	equ	'A'	; key press for menu --> play
-	options	equ	'B'	; key press for menu --> options
-	leader	equ	'C'	; key press for menu --> leaderboard
+	instructions	equ	'B'	; key press for menu --> options
 
 	
 psect	delay_code,class=CODE
@@ -94,17 +96,16 @@ delay_menu:	; delay routine which waits for valid input to move from menu
 	movwf	input, A	; stores in input
 	movlw	play
 	cpfseq	input, A	; checks if play button pressed
-	bra	options_select	; if not check options
+	bra	instructions_select	; if not check options
 	retlw	play		; return play
-options_select:
-	movlw	options
+instructions_select:
+	movlw	instructions
 	cpfseq	input, A	; check if options button pressed
-	bra	leader_select	; if not check leader
-	retlw	options		; return option
-leader_select:
-	movlw	leader		
-	cpfseq	input, A	; check if leader button pressed
-	bra	delay_menu	; if not take new input
-	retlw	leader		; return leader
-	
+	bra	delay_menu	; if not check leader
+	call	write_instructions_menu
+	movlw	0x01
+	call	long_delay
+	call	GLCD_fill_0
+	call	draw_menu
+	bra	delay_menu
     end
