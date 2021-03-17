@@ -16,7 +16,7 @@ extrn	setup_score, write_digit_1, write_digit_2, write_digit_3, write_digit_4
 
 global	draw_menu, menu_plus_options, draw_end_screen, draw_victory_screen
 global	_0, _1, _2, _3, _4, _5, _6, _7, _8, _9
-global	draw_level_1_screen, draw_level_2_screen, draw_level_3_screen
+global	draw_level_1_screen, draw_level_2_screen, draw_level_3_screen, draw_level_4_screen
 global	write_instructions_menu
 global	display_score
     
@@ -635,7 +635,20 @@ draw_level_3_screen:  ; draws the main menu
    movwf    y_pos, A
    call	    GLCD_set_y
    call	    _3
-   return     
+   return
+   
+draw_level_4_screen:  ; draws the main menu
+   ; writes "main menu" to top line
+   call	    GLCD_left
+   movlw    0x03
+   movwf    x_pos, A
+   call	    GLCD_set_x
+   call	    draw_level
+   movlw    0x30
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    _4
+   return   
    
 write_instructions_menu:
    call	    GLCD_fill_0
