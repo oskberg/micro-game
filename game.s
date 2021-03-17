@@ -5,17 +5,17 @@
 ; ====== END OF COMMENTS ======
 
 ; ====== IMPORTS/EXPORTS ======
-global	init_player, draw_player, inc_player_y, move_player_up, move_player_down
-global	draw_object, load_level, draw_level, check_collision, check_collision_break
-global	score, reset_score, load_level_1, load_level_2, load_level_3
-global	first_object, level_1_len, level_2_len, level_3_len, play_frame, play_levels
+global	init_player, draw_player, move_player_up, move_player_down
+global	check_collision_break, play_levels, reset_score
+global	score, first_object
     
-extrn	GLCD_fill_section, GLCD_left, GLCD_right, GLCD_fill_page_whole, GLCD_remove_section, GLCD_set_x, GLCD_set_y
+extrn	GLCD_fill_section, GLCD_left, GLCD_right, GLCD_fill_page_whole 
+extrn	GLCD_remove_section, GLCD_set_x, GLCD_set_y, GLCD_fill_0
 extrn	end_game
 extrn	x_pos, y_pos, y_pos_t, time, collision
-extrn	GLCD_fill_0
 extrn	delay_key_press, long_delay
-extrn	draw_level_1_screen, draw_level_2_screen, draw_level_3_screen, display_score, draw_level_4_screen
+extrn	draw_level_1_screen, draw_level_2_screen, draw_level_3_screen
+extrn	display_score, draw_level_4_screen
 
 ; ====== VARIABLE DECLARATIONS ======
     
@@ -29,8 +29,8 @@ score:		ds 1
     width_object	equ 0x04
     object_separation	equ 0x18
     width_object_1	equ 0x04
-    object_separation_1	equ 0x18
-    time_inc_1		equ 2
+    object_separation_1	equ 0x1C
+    time_inc_1		equ 4
     width_object_2	equ 0x04
     object_separation_2	equ 0x14
     time_inc_2		equ 4
@@ -67,7 +67,7 @@ gap_pages:
 level_1:
 	db  1,2,3,4,2,6,3,1,7,6,7,3,2,5,4,3,7,1,5,1,5,2,7,0xa    ; level with terminator
 ;	db  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0xa    ; level with terminator	
-	level_1_len	    equ 2
+	level_1_len	    equ 11
 	    
 level_2:
 	db  2,3,2,6,1,2,7,5,4,5,3,1,5,1,2,3,1,5,1,3,6,4,7,0xa    ; level with terminator
@@ -194,6 +194,7 @@ ll_1_loop:
 	movwf	object_T, A	; set object separation to 24 pixels
 ;	movlb	0x00		; reset bank
 	movlw	time_inc_1
+	addlw	time_inc_1
 	sublw	0x00
 	movwf	time, A
 
@@ -230,6 +231,7 @@ ll_2_loop:
 	movwf	object_T, A	; set object separation to 24 pixels
 ;	movlb	0x00		; reset bank
 	movlw	time_inc_2
+	addlw	time_inc_2
 	sublw	0x00
 	movwf	time, A
 	return	0

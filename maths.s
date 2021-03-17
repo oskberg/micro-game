@@ -1,7 +1,7 @@
 #include <xc.inc>
     
-global  prod_1, prod_2, prod_3, prod_4, dec_1, dec_2, dec_3, dec_4, hex_to_dec
-global	mul_16_l_2, mul_16_h_2, score_to_digits
+global  prod_1, prod_2, prod_3, prod_4, dec_1, dec_2, dec_3, dec_4
+global	score_to_digits
     
 extrn	score
     

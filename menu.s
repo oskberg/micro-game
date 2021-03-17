@@ -6,17 +6,17 @@
 ; ====== END OF COMMENTS ======
 
 ; ====== IMPORTS/EXPORTS ======
-extrn	GLCD_set_x, GLCD_set_y, GLCD_write_d, GLCD_left, GLCD_remove_section, GLCD_right
-extrn	x_pos, y_pos
-extrn	delay_ms, delay_x4us, delay, long_delay, delay_key_press, delay_menu
-extrn	GLCD_setup, GLCD_fill_0, GLCD_fill_1
-extrn	init_player, draw_player, inc_player_y
+extrn	GLCD_set_x, GLCD_set_y, GLCD_write_d, GLCD_left, GLCD_remove_section
+extrn	GLCD_right, GLCD_fill_0, x_pos, y_pos
+extrn	long_delay, delay_menu
+extrn	draw_player
 extrn	setup_score, write_digit_1, write_digit_2, write_digit_3, write_digit_4
     
 
 global	draw_menu, menu_plus_options, draw_end_screen, draw_victory_screen
 global	_0, _1, _2, _3, _4, _5, _6, _7, _8, _9
-global	draw_level_1_screen, draw_level_2_screen, draw_level_3_screen, draw_level_4_screen
+global	draw_level_1_screen, draw_level_2_screen, draw_level_3_screen
+global	draw_level_4_screen
 global	write_instructions_menu
 global	display_score
     
@@ -900,7 +900,7 @@ write_instructions_menu:
    call	    GLCD_set_y
    call	    N
    
-    ; writes, "there's 3 levels"
+    ; writes, "4 levels"
    call	    GLCD_left
    movlw    0x05
    movwf    x_pos, A
@@ -908,40 +908,7 @@ write_instructions_menu:
    movlw    0x00
    movwf    y_pos, A
    call	    GLCD_set_y
-   call	    T
-   movlw    0x08
-   movwf    y_pos, A
-   call	    GLCD_set_y
-   call	    H
-   movlw    0x10
-   movwf    y_pos, A
-   call	    GLCD_set_y
-   call	    E
-   movlw    0x18
-   movwf    y_pos, A
-   call	    GLCD_set_y
-   call	    R
-   movlw    0x20
-   movwf    y_pos, A
-   call	    GLCD_set_y
-   call	    E
-   movlw    0x28
-   movwf    y_pos, A
-   call	    GLCD_set_y
-   call	    APO
-   movlw    0x30
-   movwf    y_pos, A
-   call	    GLCD_set_y
-   call	    S
-   movlw    0x38
-   movwf    y_pos, A
-   call	    GLCD_set_y
-   call	    GAP
-   call	    GLCD_right
-   movlw    0x00
-   movwf    y_pos, A
-   call	    GLCD_set_y
-   call	    _3
+   call	    _4
    movlw    0x08
    movwf    y_pos, A
    call	    GLCD_set_y
@@ -970,7 +937,20 @@ write_instructions_menu:
    movwf    y_pos, A
    call	    GLCD_set_y
    call	    S
-   
+   call	    GLCD_right
+   movlw    0x00
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    GAP
+   movlw    0x08
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    O
+   movlw    0x10
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    F_
+
     ; writes, "of increasing"
    call	    GLCD_left
    movlw    0x06

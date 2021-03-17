@@ -8,10 +8,9 @@
 global	delay_ms, delay_x4us, delay, long_delay, delay_key_press, delay_menu
 
 extrn	button_press
-extrn	inc_player_y, move_player_up, move_player_down
-extrn	write_instructions_menu
+extrn	move_player_up, move_player_down
+extrn	write_instructions_menu, draw_menu
 extrn	GLCD_fill_0
-extrn	draw_menu
     
 psect	udata_acs   ; named variables in access ram
 cnt_l:		ds 1   ; reserve 1 byte for variable LCD_cnt_l
