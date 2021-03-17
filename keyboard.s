@@ -21,7 +21,7 @@ delay_count:ds 1    ; reserve one byte for counter in the delay routine
 rowVal:	    ds 1    ; reserve one byte for the row value
 colVal:	    ds 1    ; reserve one byte for the column value
 padVal:	    ds 1    ; reserve one byte for the pad output value
-keyCounter:  ds 1    ; reserve one byte for array looping
+keyCounter: ds 1    ; reserve one byte for array looping
 asciiVal:   ds 1    ; 1 byte for ascii value
     
 

@@ -751,8 +751,7 @@ draw_level_1_screen:  ; draws the level 1 opening screen
    call	    GLCD_set_x
    call	    draw_num_obstacles
    ; writes "xxxx"
-   movlw    0x01
-   sublw    level_1_len
+   movlw    level_1_len
    call	    binary_to_digits
    call	    write_score
    return
@@ -775,8 +774,7 @@ draw_level_2_screen:  ; draws the level 2 opening screen
    call	    GLCD_set_x
    call	    draw_num_obstacles
    ; writes "xxxx"
-   movlw    0x01
-   sublw    level_2_len   
+   movlw    level_2_len
    call	    binary_to_digits
    call	    write_score
    return   
@@ -799,8 +797,7 @@ draw_level_3_screen:  ; draws the level 3 opening screen
    call	    GLCD_set_x
    call	    draw_num_obstacles
    ; writes "xxxx"
-   movlw    0x01
-   sublw    level_3_len
+   movlw    level_3_len
    call	    binary_to_digits
    call	    write_score
    return
@@ -823,8 +820,7 @@ draw_level_4_screen:    ; draws the level 4 opening screen
    call	    GLCD_set_x
    call	    draw_num_obstacles
    ; writes "xxxx"
-   movlw    0x01
-   sublw    level_4_len
+   movlw    level_4_len
    call	    binary_to_digits
    call	    write_score
    return   

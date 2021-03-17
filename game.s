@@ -30,10 +30,10 @@ global	level_1_len, level_2_len, level_3_len, level_4_len
 ; ====== VARIABLE DECLARATIONS ======
     
 psect	udata_acs   ; named variables in access ram
-player_x:	ds 1
-player_y:	ds 1
-temp_count:	ds 1
-score:		ds 1
+player_x:	ds  1
+player_y:	ds  1
+temp_count:	ds  1
+score:		ds  1
 first_object:	ds  1
 draw_count:	ds  1
 object_T:	ds  1
@@ -43,7 +43,8 @@ x_count:	ds  1
 current_gap:	ds  1
 time_inc:	ds  1
 speed_key_press:ds  1
-
+current_len:	ds  1
+    
 ;    Constants which define how each level will run
     player_width	equ 0x08
     width_object	equ 0x04
@@ -57,7 +58,7 @@ speed_key_press:ds  1
     width_object_3	equ 0x04
     object_separation_3	equ 0x10
     time_inc_3		equ 4
-    width_object_4	equ 0x04
+    width_object_4	equ 0x08
     object_separation_4	equ 0x20
     time_inc_4		equ 8
     
@@ -74,20 +75,20 @@ gap_pages:  ; test level
 	align	2
 	
 level_1:
-	db  1,2,3,4,2,6,3,1,7,6,7,3,2,5,4,3,7,1,5,1,5,2,7,0xa    ; level with terminator
-	level_1_len	    equ 11
+	db  1,2,3,4,2,6,3,1,7,6,7,3,2,5,4,3,7,1,5,1,5,2,7    ; level with terminator
+	level_1_len	    equ 10
 	    
 level_2:
-	db  2,3,2,6,1,2,7,5,4,5,3,1,5,1,2,3,1,5,1,3,6,4,7,0xa    ; level with terminator
-	level_2_len	    equ 24
+	db  2,3,2,6,1,2,7,5,4,5,3,1,5,1,2,3,1,5,1,3,6,4,7    ; level with terminator
+	level_2_len	    equ 23
 	    
 level_3:
-	db  4,6,5,3,1,7,5,6,7,0,1,2,1,3,2,4,3,5,4,6,5,7,0,0xa	 ; level with terminator
-	level_3_len	    equ 24
+	db  4,6,5,3,1,7,5,6,7,0,1,2,1,3,2,4,3,5,4,6,5,7,0	 ; level with terminator
+	level_3_len	    equ 23
 	    
 level_4:
-	db  3,7,3,6,3,5,3,4,1,5,2,6,7,3,0,5,1,3,7,2,4,7,1,0xa    ; level with terminator
-	level_4_len	    equ 24
+	db  3,7,3,6,3,5,3,4,1,5,2,6,7,3,0,5,1,3,7,2,4,7,1    ; level with terminator
+	level_4_len	    equ 23
 	
 ; =========================
 ; ====== SUBROUTINES ======
@@ -157,6 +158,7 @@ load_level_1:	; loads level 1 from PM --> 'current gaps' in Bank 1
 	movwf	TBLPTRL, A		; load low byte to TBLPTRL
 	movlw	level_1_len		; bytes to read
 	movwf 	temp_count, A		; our counter register
+	movwf	current_len, A		; store current lenght of level
 ll_1_loop:
         tblrd*+			    ; one byte from PM to TABLAT, increment TBLPRT
 	movff	TABLAT, POSTINC0    ; move data from TABLAT to (FSR0), inc FSR0	
@@ -188,6 +190,7 @@ load_level_2:	; loads level 2 from PM --> 'current gaps' in Bank 1
 	movwf	TBLPTRL, A		; load low byte to TBLPTRL
 	movlw	level_2_len		; bytes to read
 	movwf 	temp_count, A		; our counter register
+	movwf	current_len, A		; store current lenght of level
 ll_2_loop:
         tblrd*+				; one byte from PM to TABLAT, increment TBLPRT
 	movff	TABLAT, POSTINC0	; move data from TABLAT to (FSR0), inc FSR0	
@@ -218,6 +221,7 @@ load_level_3:	; loads level 3 from PM --> 'current gaps' in Bank 1
 	movwf	TBLPTRL, A		; load low byte to TBLPTRL
 	movlw	level_3_len		; bytes to read
 	movwf 	temp_count, A		; our counter register
+	movwf	current_len, A		; store current lenght of level
 ll_3_loop:
         tblrd*+				; one byte from PM to TABLAT, increment TBLPRT
 	movff	TABLAT, POSTINC0	; move data from TABLAT to (FSR0), inc FSR0	
@@ -248,6 +252,7 @@ load_level_4:	; loads level 4 from PM --> 'current gaps' in Bank 1
 	movwf	TBLPTRL, A		; load low byte to TBLPTRL
 	movlw	level_4_len		; bytes to read
 	movwf 	temp_count, A		; our counter register
+	movwf	current_len, A		; store current lenght of level
 ll_4_loop:
         tblrd*+				; one byte from PM to TABLAT, increment TBLPRT
 	movff	TABLAT, POSTINC0	; move data from TABLAT to (FSR0), inc FSR0	
@@ -287,6 +292,11 @@ dlsp:	movlw	0x00
 	movf	first_object, W, A  ; checks which obsticle to start at
 	addwf	FSR0, F, A	    ; finds corresponding location in RAM
 dlloop:	
+	movf	draw_count, W, A
+	addwf	first_object, W, A
+	cpfsgt	current_len, A	    ; return if end of level is reached	
+	return	0
+    
 	movf	POSTINC0, W, A	    ; move gap at lsfr0 into current_gap
 	movwf	current_gap, A
 	
@@ -308,8 +318,8 @@ dlloop:
 	call	draw_object	    ; draw object
 	
 	incf	draw_count, F, A    ; select next object
-	movlw	0x05		    ; max number of objects on the screen at once
-	cpfsgt	draw_count, A	    ; check if all obsticles drawn
+	movlw	0x07		    ; max number of objects on the screen at once
+	cpfsgt	draw_count, A	    ; check if all obstacles drawn
 	bra	dlloop		    ; repeat
 	
 	return	0
@@ -426,8 +436,7 @@ play_levels:	; runs through all levels till a win or player dies
 	
 level_1_play:	; runs level 1
 	call	play_frame		; run a framce
-	movlw	0x01
-	sublw	level_1_len		; check if level complete
+	movlw	level_1_len
 	cpfseq	first_object, A
 	bra	level_1_play		; repeat
 	
@@ -445,8 +454,7 @@ level_2_draw:				; prepare level 2
 	
 level_2_play:				; play level 2
 	call	play_frame		; play frame
-	movlw	0x01
-	sublw	level_2_len		; check if level 2 complete
+	movlw	level_2_len
 	cpfseq	first_object, A
 	bra	level_2_play		; repeat
 	
@@ -464,8 +472,7 @@ level_3_draw:				; prepare level 3
 	
 level_3_play:				; play level 3
 	call	play_frame		; play frame
-	movlw	0x01
-	sublw	level_3_len		; check if level 2 complete
+	movlw	level_3_len
 	cpfseq	first_object, A
 	bra	level_3_play		; repeat
 	
@@ -483,8 +490,7 @@ level_4_draw:				; prepare level 4
 	
 level_4_play:				; play level 4
 	call	play_frame		; play frame
-	movlw	0x01
-	sublw	level_4_len		; check if level 4 complete
+	movlw	level_4_len
 	cpfseq	first_object, A
 	bra	level_4_play		; repeat
 	return				; return as finised game
