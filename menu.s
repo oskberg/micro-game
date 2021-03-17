@@ -11,6 +11,8 @@ extrn	GLCD_right, GLCD_fill_0, x_pos, y_pos
 extrn	long_delay, delay_menu
 extrn	draw_player
 extrn	setup_score, write_digit_1, write_digit_2, write_digit_3, write_digit_4
+extrn	binary_to_digits
+extrn	level_1_len, level_2_len, level_3_len, level_4_len
     
 
 global	draw_menu, menu_plus_options, draw_end_screen, draw_victory_screen
@@ -597,11 +599,145 @@ draw_level:
    call	    GLCD_set_y
    call	    GAP
    return
+   
+draw_num_obsticles:
+   ;	writes "total number of"
+   movlw    0x00
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    N
+   movlw    0x08
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    U
+   movlw    0x10
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    M
+   movlw    0x18
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    B_
+   movlw    0x20
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    E
+   movlw    0x28
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    R
+   movlw    0x30
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    GAP
+   movlw    0x38
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    O
+   call	    GLCD_right
+   movlw    0x00
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    F_
+   movlw    0x08
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    GAP
+;   movlw    0x10
+;   movwf    y_pos, A
+;   call	    GLCD_set_y
+;   call	    O
+;   movlw    0x18
+;   movwf    y_pos, A
+;   call	    GLCD_set_y
+;   call	    R
+;   movlw    0x20
+;   movwf    y_pos, A
+;   call	    GLCD_set_y
+;   call	    GAP
+;   movlw    0x28
+;   movwf    y_pos, A
+;   call	    GLCD_set_y
+;   call	    O
+;   movlw    0x30
+;   movwf    y_pos, A
+;   call	    GLCD_set_y
+;   call	    F_
+   
+   ;	writes "obsticeles:"
+   incf	    x_pos, F, A
+   call	    GLCD_set_x
+   call	    GLCD_left
+   movlw    0x00
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    O
+   movlw    0x08
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    B_
+   movlw    0x10
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    S
+   movlw    0x18
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    T
+   movlw    0x20
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    I
+   movlw    0x28
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    C_
+   movlw    0x30
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    L
+   movlw    0x38
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    E
+   call	    GLCD_right
+   movlw    0x00
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    S
+   movlw    0x08
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    COLON
+   movlw    0x10
+   movwf    y_pos, A
+   call	    GLCD_set_y
+   call	    GAP
+   return
  
+write_score:
+   movlw    0x08
+   addwf    y_pos, F, A
+   call	    GLCD_set_y
+   call	    write_digit_1
+   movlw    0x08
+   addwf    y_pos, F, A
+   call	    GLCD_set_y
+   call	    write_digit_2
+   movlw    0x08
+   addwf    y_pos, F, A
+   call	    GLCD_set_y
+   call	    write_digit_3
+   movlw    0x08
+   addwf    y_pos, F, A
+   call	    GLCD_set_y
+   call	    write_digit_4
+   return
+   
 draw_level_1_screen:  ; draws the main menu
    ; writes "main menu" to top line
    call	    GLCD_left
-   movlw    0x03
+   movlw    0x02
    movwf    x_pos, A
    call	    GLCD_set_x
    call	    draw_level
@@ -609,12 +745,20 @@ draw_level_1_screen:  ; draws the main menu
    movwf    y_pos, A
    call	    GLCD_set_y
    call	    _1
+   movlw    0x04
+   movwf    x_pos, A
+   call	    GLCD_set_x
+   call	    draw_num_obsticles
+   movlw    0x01
+   sublw    level_1_len
+   call	    binary_to_digits
+   call	    write_score
    return
    
 draw_level_2_screen:  ; draws the main menu
    ; writes "main menu" to top line
    call	    GLCD_left
-   movlw    0x03
+   movlw    0x02
    movwf    x_pos, A
    call	    GLCD_set_x
    call	    draw_level
@@ -622,12 +766,20 @@ draw_level_2_screen:  ; draws the main menu
    movwf    y_pos, A
    call	    GLCD_set_y
    call	    _2
+   movlw    0x04
+   movwf    x_pos, A
+   call	    GLCD_set_x
+   call	    draw_num_obsticles
+   movlw    0x01
+   sublw    level_2_len   
+   call	    binary_to_digits
+   call	    write_score
    return   
    
 draw_level_3_screen:  ; draws the main menu
    ; writes "main menu" to top line
    call	    GLCD_left
-   movlw    0x03
+   movlw    0x02
    movwf    x_pos, A
    call	    GLCD_set_x
    call	    draw_level
@@ -635,12 +787,20 @@ draw_level_3_screen:  ; draws the main menu
    movwf    y_pos, A
    call	    GLCD_set_y
    call	    _3
+   movlw    0x04
+   movwf    x_pos, A
+   call	    GLCD_set_x
+   call	    draw_num_obsticles
+   movlw    0x01
+   sublw    level_3_len
+   call	    binary_to_digits
+   call	    write_score
    return
    
 draw_level_4_screen:  ; draws the main menu
    ; writes "main menu" to top line
    call	    GLCD_left
-   movlw    0x03
+   movlw    0x02
    movwf    x_pos, A
    call	    GLCD_set_x
    call	    draw_level
@@ -648,6 +808,14 @@ draw_level_4_screen:  ; draws the main menu
    movwf    y_pos, A
    call	    GLCD_set_y
    call	    _4
+   movlw    0x04
+   movwf    x_pos, A
+   call	    GLCD_set_x
+   call	    draw_num_obsticles
+   movlw    0x01
+   sublw    level_4_len
+   call	    binary_to_digits
+   call	    write_score
    return   
    
 write_instructions_menu:

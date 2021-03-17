@@ -1,7 +1,7 @@
 #include <xc.inc>
     
 global  prod_1, prod_2, prod_3, prod_4, dec_1, dec_2, dec_3, dec_4
-global	score_to_digits
+global	binary_to_digits
     
 extrn	score
     
@@ -42,8 +42,8 @@ psect	maths_code,class=CODE
 ;	movff	PRODL, mul_1, A
 ;	movff	PRODH, mul_2, A
 ;	return
-score_to_digits:
-    movf    score, W, A
+binary_to_digits:
+;    movf    score, W, A
     movwf   temp_1, A
     movlw   0x00
     movwf   dec_1, A

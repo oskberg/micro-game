@@ -8,7 +8,7 @@
 global	setup_score, write_digit_1, write_digit_2, write_digit_3, write_digit_4
     
 extrn	dec_1, dec_2, dec_3, dec_4
-extrn	score_to_digits
+extrn	binary_to_digits, score
 extrn	_0, _1, _2, _3, _4, _5, _6, _7, _8, _9
 
     
@@ -18,7 +18,8 @@ temp_num:    ds 1    ; reserve one byte for a counter variable
     
 psect	leaderboard_code,class=CODE    
 setup_score:
-    call    score_to_digits
+    movf    score, W, A
+    call    binary_to_digits
     return
     
 write_digit_1: 

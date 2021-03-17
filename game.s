@@ -8,6 +8,7 @@
 global	init_player, draw_player, move_player_up, move_player_down
 global	check_collision_break, play_levels, reset_score
 global	score, first_object
+global	level_1_len, level_2_len, level_3_len, level_4_len
     
 extrn	GLCD_fill_section, GLCD_left, GLCD_right, GLCD_fill_page_whole 
 extrn	GLCD_remove_section, GLCD_set_x, GLCD_set_y, GLCD_fill_0
