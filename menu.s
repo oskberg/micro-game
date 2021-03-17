@@ -600,7 +600,7 @@ draw_level:
    call	    GAP
    return
    
-draw_num_obsticles:
+draw_num_obstacles:
    ;	writes "total number of"
    movlw    0x00
    movwf    y_pos, A
@@ -687,7 +687,7 @@ draw_num_obsticles:
    movlw    0x20
    movwf    y_pos, A
    call	    GLCD_set_y
-   call	    I
+   call	    A_
    movlw    0x28
    movwf    y_pos, A
    call	    GLCD_set_y
@@ -748,7 +748,7 @@ draw_level_1_screen:  ; draws the main menu
    movlw    0x04
    movwf    x_pos, A
    call	    GLCD_set_x
-   call	    draw_num_obsticles
+   call	    draw_num_obstacles
    movlw    0x01
    sublw    level_1_len
    call	    binary_to_digits
@@ -769,7 +769,7 @@ draw_level_2_screen:  ; draws the main menu
    movlw    0x04
    movwf    x_pos, A
    call	    GLCD_set_x
-   call	    draw_num_obsticles
+   call	    draw_num_obstacles
    movlw    0x01
    sublw    level_2_len   
    call	    binary_to_digits
@@ -790,7 +790,7 @@ draw_level_3_screen:  ; draws the main menu
    movlw    0x04
    movwf    x_pos, A
    call	    GLCD_set_x
-   call	    draw_num_obsticles
+   call	    draw_num_obstacles
    movlw    0x01
    sublw    level_3_len
    call	    binary_to_digits
@@ -811,7 +811,7 @@ draw_level_4_screen:  ; draws the main menu
    movlw    0x04
    movwf    x_pos, A
    call	    GLCD_set_x
-   call	    draw_num_obsticles
+   call	    draw_num_obstacles
    movlw    0x01
    sublw    level_4_len
    call	    binary_to_digits

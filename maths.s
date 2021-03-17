@@ -1,6 +1,6 @@
 #include <xc.inc>
     
-global  prod_1, prod_2, prod_3, prod_4, dec_1, dec_2, dec_3, dec_4
+global  dec_1, dec_2, dec_3, dec_4
 global	binary_to_digits
     
 extrn	score
